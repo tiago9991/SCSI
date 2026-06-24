@@ -1,0 +1,23 @@
+# Docker build context ignores — keep image small and reproducible
+.venv
+venv
+env
+.git
+.gitignore
+design_system
+docs
+site
+__pycache__
+*.pyc
+*.pyo
+db.sqlite3
+db.sqlite3-journal
+media
+staticfiles
+*.log
+.env
+.env.example
+opencode.json
+opencode.jsonc
+.claude
+.DS_Store

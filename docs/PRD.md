@@ -1590,24 +1590,24 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 2 — Docker Local
 
-- [ ] Criar `Dockerfile` (Python 3.13).
-- [ ] Criar `docker-compose.yml` com `app`, `db`, `celery_worker`, `celery_beat`, `rabbitmq`, `redis`, `traefik` (opcional local).
-- [ ] Criar `entrypoint.sh` (app: `wait_for_db` → `migrate` → `collectstatic --clear` → `runserver`).
-- [ ] Criar `entrypoint.celery.sh` (celery: `wait_for_db` apenas).
-- [ ] Criar management command `wait_for_db`.
-- [ ] Configurar volumes locais para postgres, redis, rabbitmq, media, staticfiles.
-- [ ] Validar `docker compose up` sobe tudo.
+- [x] Criar `Dockerfile` (Python 3.13).
+- [x] Criar `docker-compose.yml` com `app`, `db`, `celery_worker`, `celery_beat`, `rabbitmq`, `redis`, `traefik` (opcional local).
+- [x] Criar `entrypoint.sh` (app: `wait_for_db` → `migrate` → `collectstatic --clear` → `runserver`).
+- [x] Criar `entrypoint.celery.sh` (celery: `wait_for_db` apenas).
+- [x] Criar management command `wait_for_db`.
+- [x] Configurar volumes locais para postgres, redis, rabbitmq, media, staticfiles.
+- [x] Validar `docker compose up` sobe tudo.
 
 ### Sprint 3 — Configuração Django
 
-- [ ] Configurar `DATABASES` via `.env`.
-- [ ] Configurar `CACHES` (Redis) via `.env`.
-- [ ] Configurar `CELERY_BROKER_URL` e `CELERY_RESULT_BACKEND` via `.env`.
-- [ ] Configurar `EMAIL_*` via `.env`.
-- [ ] Configurar `ALLOWED_HOSTS` e `CSRF_TRUSTED_ORIGINS` como listas por vírgula.
-- [ ] Configurar WhiteNoise (`CompressedStaticFilesStorage`).
-- [ ] Configurar `STATIC_ROOT` e `MEDIA_ROOT`.
-- [ ] Configurar `SECURE_PROXY_SSL_HEADER`, `SECURE_REDIRECT_EXEMPT` (condicional a produção).
+- [x] Configurar `DATABASES` via `.env`.
+- [x] Configurar `CACHES` (Redis) via `.env`.
+- [x] Configurar `CELERY_BROKER_URL` e `CELERY_RESULT_BACKEND` via `.env`.
+- [x] Configurar `EMAIL_*` via `.env`.
+- [x] Configurar `ALLOWED_HOSTS` e `CSRF_TRUSTED_ORIGINS` como listas por vírgula.
+- [x] Configurar WhiteNoise (`CompressedStaticFilesStorage`).
+- [x] Configurar `STATIC_ROOT` e `MEDIA_ROOT`.
+- [x] Configurar `SECURE_PROXY_SSL_HEADER`, `SECURE_REDIRECT_EXEMPT` (condicional a produção).
 
 ### Sprint 4 — Usuário Customizado com Login por Email
 
