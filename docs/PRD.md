@@ -1620,12 +1620,12 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 5 — Multi-Tenant Base
 
-- [ ] Criar `core.Brokerage` (CNPJ, Razão Social, etc.).
-- [ ] Criar `core.Plan` (`free` disponível, demais `is_available=False`).
-- [ ] Vincular `User.brokerage` FK.
-- [ ] Implementar `BaseTenantModel` em `base`.
-- [ ] Implementar `TenantQuerySet`/`TenantManager` filtrando por `brokerage`.
-- [ ] Criar mixins de views CBV que filtram por `request.tenant`.
+- [x] Criar `core.Brokerage` (CNPJ, Razão Social, etc.).
+- [x] Criar `core.Plan` (`free` disponível, demais `is_available=False`).
+- [x] Vincular `User.brokerage` FK.
+- [x] Implementar `BaseTenantModel` em `base`.
+- [x] Implementar `TenantQuerySet`/`TenantManager` filtrando por `brokerage`.
+- [x] Criar mixins de views CBV que filtram por `request.tenant`.
 
 ### Sprint 6 — Corretoras e Permissões
 
