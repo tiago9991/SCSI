@@ -3,6 +3,15 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import path
 
+from core.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
+
 
 def health(request):
     """Lightweight liveness probe: no DB, no auth. Used by container HEALTHCHECK and Traefik."""
@@ -12,4 +21,12 @@ def health(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('health/', health, name='health'),
+
+    # --- Auth (e-mail based login + native password reset flow) ---
+    path('accounts/login/', LoginView.as_view(), name='login'),
+    path('accounts/logout/', LogoutView.as_view(), name='logout'),
+    path('accounts/password-reset/', PasswordResetView.as_view(), name='password_reset'),
+    path('accounts/password-reset/done/', PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('accounts/reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('accounts/reset/done/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]

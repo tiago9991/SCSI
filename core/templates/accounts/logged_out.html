@@ -1,0 +1,16 @@
+{% extends "accounts/base_auth.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Sair" %}{% endblock %}
+{% block heading %}{% trans "Sessão encerrada" %}{% endblock %}
+{% block lead %}{% trans "Você saiu da sua conta com segurança." %}{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-block">{% trans "Encerrar sessão" %}</button>
+</form>
+<div class="row-links">
+    <a href="{% url 'login' %}">{% trans "Acessar novamente" %}</a>
+</div>
+{% endblock %}

@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'core.middlewares.TenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -190,6 +191,21 @@ EMAIL_DEFAULT_FROM = env('EMAIL_DEFAULT_FROM', default='no-reply@scsi.digital')
 
 # Default primary key field type.
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# --- Auth ---
+# Custom user authenticating by email (see core.models.User).
+AUTH_USER_MODEL = 'core.User'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'admin:index'
+LOGOUT_REDIRECT_URL = 'login'
+
+
+# --- Auth templates ---
+# Templates for auth views live under registration/ (app-level templates dirs
+# via APP_DIRS). Custom auth views in core override the built-ins with the
+# email-based login form and pt-br templates.
 
 
 # --- Security / hardening (apenas em producao: DEBUG=False) ---

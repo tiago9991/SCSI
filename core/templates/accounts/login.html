@@ -1,0 +1,36 @@
+{% extends "accounts/base_auth.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Acessar" %}{% endblock %}
+{% block heading %}{% trans "Acessar sua conta" %}{% endblock %}
+{% block lead %}{% trans "Use seu e-mail e senha cadastrados para continuar." %}{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="errors">
+        {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <div class="field">
+        <label for="id_username">{% trans "E-mail" %}</label>
+        <input type="email" name="username" id="id_username" autocomplete="email"
+               value="{{ form.username.value|default:"" }}" autofocus required>
+        {% if form.username.errors %}<div class="errorlist">{{ form.username.errors }}</div>{% endif %}
+    </div>
+
+    <div class="field">
+        <label for="id_password">{% trans "Senha" %}</label>
+        <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+        {% if form.password.errors %}<div class="errorlist">{{ form.password.errors }}</div>{% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">{% trans "Entrar" %}</button>
+</form>
+
+<div class="row-links">
+    <a href="{% url 'password_reset' %}">{% trans "Esqueci minha senha" %}</a>
+</div>
+{% endblock %}

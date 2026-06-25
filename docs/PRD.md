@@ -1611,12 +1611,12 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 4 — Usuário Customizado com Login por Email
 
-- [ ] Criar `core.User` (`AbstractUser` adaptado, `USERNAME_FIELD='email'`, sem `username`).
-- [ ] Configurar `AUTH_USER_MODEL='core.User'`.
-- [ ] Criar views/templates de login por email (CBV).
-- [ ] Criar logout.
-- [ ] Configurar recuperação de senha por email (nativo Django).
-- [ ] Criar middleware de tenant (`TenantMiddleware`).
+- [x] Criar `core.User` (`AbstractUser` adaptado, `USERNAME_FIELD='email'`, sem `username`).
+- [x] Configurar `AUTH_USER_MODEL='core.User'`.
+- [x] Criar views/templates de login por email (CBV).
+- [x] Criar logout.
+- [x] Configurar recuperação de senha por email (nativo Django).
+- [x] Criar middleware de tenant (`TenantMiddleware`).
 
 ### Sprint 5 — Multi-Tenant Base
 
