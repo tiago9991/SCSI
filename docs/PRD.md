@@ -1638,11 +1638,11 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 7 — Clientes
 
-- [ ] Criar app `clients` com `Client` (tenant).
-- [ ] CRUD de clientes (CBV) com filtros e busca.
-- [ ] Tela de detalhe do cliente.
-- [ ] Placeholder para botão "Resumir com IA" (Sprint 23).
-- [ ] Anexos de cliente (Sprint 14).
+- [x] Criar app `clients` com `Client` (tenant).
+- [x] CRUD de clientes (CBV) com filtros e busca.
+- [x] Tela de detalhe do cliente.
+- [x] Placeholder para botão "Resumir com IA" (Sprint 23).
+- [x] Anexos de cliente (Sprint 14).
 
 ### Sprint 8 — Seguradoras e Ramos
 

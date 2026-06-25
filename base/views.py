@@ -77,8 +77,23 @@ class TenantFormMixin:
     tenant_field = 'brokerage'
 
     def form_valid(self, form):
-        if not getattr(form.instance, self.tenant_field, None):
-            setattr(form.instance, self.tenant_field, self.request.tenant)
+        # Stamp the current tenant on create — but only when the form actually
+        # carries a model instance (ModelForm-backed views) and the model owns
+        # the tenant field. ``DeleteView`` uses a plain ``Form`` without
+        # ``.instance``; in that case the object was already fetched through
+        # the tenant-scoped ``get_object()`` so we skip the stamp and simply
+        # delegate to the underlying view logic.
+        from django.core.exceptions import FieldDoesNotExist
+
+        instance = getattr(form, 'instance', None)
+        if instance is not None:
+            try:
+                instance._meta.get_field(self.tenant_field)
+                has_field = True
+            except FieldDoesNotExist:
+                has_field = False
+            if has_field and not getattr(instance, f'{self.tenant_field}_id', None):
+                setattr(instance, self.tenant_field, self.request.tenant)
         return super().form_valid(form)
 
     def restrict_form_choices(self, form):

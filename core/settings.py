@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'core',
     'base',
     'onboarding',
+    'clients',
 ]
 
 MIDDLEWARE = [

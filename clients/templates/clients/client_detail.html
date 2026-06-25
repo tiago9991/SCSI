@@ -1,0 +1,123 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ client.full_name }}{% endblock %}
+{% block page_title %}{{ client.full_name }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes do cliente" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'clients:client_list' %}">Clientes</a>
+<span class="current">{{ client.full_name }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Dados do cliente" %}</h2>
+            </div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Nome" %}</dt>
+                    <dd>{{ client.first_name }}</dd>
+
+                    {% if client.last_name %}
+                    <dt>{% trans "Sobrenome" %}</dt>
+                    <dd>{{ client.last_name }}</dd>
+                    {% endif %}
+
+                    {% if client.document %}
+                    <dt>CPF / CNPJ</dt>
+                    <dd>{{ client.document }}</dd>
+                    {% endif %}
+
+                    {% if client.email %}
+                    <dt>{% trans "E-mail" %}</dt>
+                    <dd>{{ client.email }}</dd>
+                    {% endif %}
+
+                    {% if client.phone %}
+                    <dt>{% trans "Telefone" %}</dt>
+                    <dd>{{ client.phone }}</dd>
+                    {% endif %}
+
+                    {% if client.birth_date %}
+                    <dt>{% trans "Data de nascimento" %}</dt>
+                    <dd>{{ client.birth_date|date:"d/m/Y" }}</dd>
+                    {% endif %}
+
+                    {% if client.address %}
+                    <dt>{% trans "Endereço" %}</dt>
+                    <dd>{{ client.address }}</dd>
+                    {% endif %}
+
+                    <dt>{% trans "Cadastrado em" %}</dt>
+                    <dd>{{ client.created_at|date:"d/m/Y H:i" }}</dd>
+
+                    <dt>{% trans "Atualizado em" %}</dt>
+                    <dd>{{ client.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+
+                {% if client.notes %}
+                <hr style="border:0;border-top:1px solid var(--border);margin:1rem 0;">
+                <h3 style="margin:0 0 .4rem;font-size:.95rem;">{% trans "Observações" %}</h3>
+                <p style="margin:0;color:var(--muted);white-space:pre-wrap;">{{ client.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- AI summary placeholder (Sprint 23) --- #}
+        <div class="ai-block">
+            <div class="ai-card">
+                <div class="ai-head">
+                    <div class="ai-icon">✨</div>
+                    <h3>{% trans "Resumo com IA" %}</h3>
+                </div>
+                {% if client.ai_summary %}
+                <p class="ai-text">{{ client.ai_summary }}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        {% trans "Atualizar resumo" %}
+                    </button>
+                </div>
+                {% else %}
+                <p class="ai-text">{% trans "Gere um resumo automático deste cliente com a IA, conectando propostas, apólices e sinistros." %}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        ✨ {% trans "Resumir com IA" %}
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- Attachments placeholder (Sprint 14) --- #}
+        <div class="ai-block">
+            <div class="attach-card">
+                <h3>📎 {% trans "Anexos" %}</h3>
+                <p>{% trans "Anexos deste cliente serão disponibilizados em breve." %}</p>
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Resumo rápido" %}</h2>
+            </div>
+            <div class="card-body">
+                <p style="margin:0 0 .5rem;color:var(--muted);font-size:.85rem;">
+                    {% trans "Propostas, apólices e sinistros deste cliente serão listados aqui assim que os módulos correspondentes forem habilitados." %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}
