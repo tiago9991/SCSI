@@ -1,7 +1,7 @@
 """URL configuration for the core project."""
 from django.contrib import admin
 from django.http import HttpResponse
-from django.urls import path
+from django.urls import include, path
 
 from core.views import (
     LoginView,
@@ -14,11 +14,14 @@ from core.views import (
 
 
 def health(request):
-    """Lightweight liveness probe: no DB, no auth. Used by container HEALTHCHECK and Traefik."""
+    """Lightness probe: no DB, no auth. Used by container HEALTHCHECK and Traefik."""
     return HttpResponse('ok', content_type='text/plain')
 
 
 urlpatterns = [
+    # --- Landing + Onboarding (root ``/`` and `/cadastro/`) ---
+    path('', include(('onboarding.urls', 'onboarding'), namespace='onboarding')),
+
     path('admin/', admin.site.urls),
     path('health/', health, name='health'),
 

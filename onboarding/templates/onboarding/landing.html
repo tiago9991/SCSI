@@ -1,0 +1,90 @@
+{% extends "onboarding/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<header class="site-header">
+    <div class="container">
+        <a href="{% url 'onboarding:landing' %}" class="brand">
+            <div class="brand-mark">S</div>
+            <div class="brand-name">SCSI <small>Gestão para Corretora de Seguros</small></div>
+        </a>
+        <nav class="nav-cta">
+            <a href="{% url 'login' %}" class="btn btn-ghost">{% trans "Acessar" %}</a>
+            <a href="{% url 'onboarding:signup' %}" class="btn btn-primary">{% trans "Criar conta" %}</a>
+        </nav>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container hero-inner">
+        <span class="eyebrow">⚡ {% trans "SaaS multi-corretoras" %}</span>
+        <h1>{% trans "Gestão completa da sua corretora em um só lugar" %}</h1>
+        <p class="lead">
+            {% trans "Clientes, propostas, apólices, sinistros, renovações, CRM, comissões, relatórios e agentes de IA — tudo integrado em uma plataforma multi-tenant com isolamento absoluto entre corretoras." %}
+        </p>
+        <div class="hero-cta">
+            <a href="{% url 'onboarding:signup' %}" class="btn btn-primary btn-lg">{% trans "Criar conta grátis" %}</a>
+            <a href="#planos" class="btn btn-outline btn-lg">{% trans "Ver planos" %}</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature">
+                <div class="ico">🛡️</div>
+                <h3>{% trans "Multi-tenant isolado" %}</h3>
+                <p>{% trans "Cada corretora enxerga apenas seus dados. Nenhum vazamento entre tenants, em listagens, anexos e ferramentas de IA." %}</p>
+            </div>
+            <div class="feature">
+                <div class="ico">📋</div>
+                <h3>{% trans "Propostas → Apólices" %}</h3>
+                <p>{% trans "Geração automática de apólice a partir de proposta aceita, com itens cobertos copiados. Endossos e renovações." %}</p>
+            </div>
+            <div class="feature">
+                <div class="ico">🧭</div>
+                <h3>{% trans "CRM em grid e Kanban" %}</h3>
+                <p>{% trans "Pipeline personalizável por corretora, com etapas e cores próprias, drag-and-drop e resumos com IA." %}</p>
+            </div>
+            <div class="feature">
+                <div class="ico">🤖</div>
+                <h3>{% trans "Agentes de IA" %}</h3>
+                <p>{% trans "Resumos de clientes, apólices, sinistros e negociações em Celery. Chat com sessões salvas e Markdown." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="plans" id="planos">
+    <div class="container">
+        <div class="plans-head">
+            <h2>{% trans "Planos" %}</h2>
+            <p>{% trans "Comece grátis hoje. Planos pagos em breve." %}</p>
+        </div>
+        <div class="plans-grid">
+            {% for plan in plans %}
+            <div class="plan {% if plan.code == 'free' %}featured{% endif %}">
+                {% if plan.is_available %}<span class="tag">{% trans "Disponível" %}</span>{% else %}<span class="tag tag-soon">{% trans "Em breve" %}</span>{% endif %}
+                <div class="plan-name">{{ plan.name }}</div>
+                <div class="plan-price">
+                    {% if plan.code == 'free' %}R$ 0 <small>/ {% trans "mês" %}</small>{% else %}R$ — <small>/ {% trans "mês" %}</small>{% endif %}
+                </div>
+                <div class="plan-desc">{{ plan.description|default_if_none:"" }}</div>
+                {% if plan.is_available %}
+                    <a href="{% url 'onboarding:signup' %}?plan={{ plan.code }}" class="btn btn-primary btn-block">{% trans "Começar agora" %}</a>
+                {% else %}
+                    <button type="button" class="btn btn-outline btn-block" disabled aria-disabled="true" title="{% trans "em breve" %}">{% trans "Em breve" %}</button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div class="container">SCSI · {% trans "Sistema de Gestão para Corretora de Seguros Inteligente" %} · © {% now "Y" %}</div>
+</footer>
+{% endblock %}

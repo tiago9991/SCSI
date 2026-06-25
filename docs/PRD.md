@@ -1629,12 +1629,12 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 6 — Corretoras e Permissões
 
-- [ ] Criar fluxo de cadastro de corretora (CNPJ + Razão Social obrigatórios).
-- [ ] Criar `Group`s: `brokerage_admin`, `brokerage_agent`, `brokerage_producer`, `brokerage_backoffice`, `scsi_staff`.
-- [ ] Criar permissões customizadas por model quando necessário.
-- [ ] Criar landing page (raiz `/`) com CTA e planos.
-- [ ] Habilitar apenas plano `free`; demais botões "em breve".
-- [ ] Após cadastro, criar usuário admin vinculado à corretora.
+- [x] Criar fluxo de cadastro de corretora (CNPJ + Razão Social obrigatórios).
+- [x] Criar `Group`s: `brokerage_admin`, `brokerage_agent`, `brokerage_producer`, `brokerage_backoffice`, `scsi_staff`.
+- [x] Criar permissões customizadas por model quando necessário.
+- [x] Criar landing page (raiz `/`) com CTA e planos.
+- [x] Habilitar apenas plano `free`; demais botões "em breve".
+- [x] Após cadastro, criar usuário admin vinculado à corretora.
 
 ### Sprint 7 — Clientes
 
