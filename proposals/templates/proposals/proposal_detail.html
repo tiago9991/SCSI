@@ -1,0 +1,163 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes da proposta" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'proposals:proposal_list' %}">Propostas</a>
+<span class="current">{% trans "Proposta" %} #{{ proposal.pk }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Dados da proposta" %}</h2>
+            </div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Cliente" %}</dt>
+                    <dd><a href="{% url 'clients:client_detail' proposal.client_id %}">{{ proposal.client.full_name }}</a></dd>
+
+                    <dt>{% trans "Seguradora" %}</dt>
+                    <dd><a href="{% url 'catalog:insurancecompany_detail' proposal.insurance_company_id %}">{{ proposal.insurance_company.name }}</a></dd>
+
+                    <dt>{% trans "Ramo" %}</dt>
+                    <dd><a href="{% url 'catalog:branch_detail' proposal.branch_id %}">{{ proposal.branch.name }}</a></dd>
+
+                    <dt>{% trans "Status" %}</dt>
+                    <dd><span class="pill">{{ proposal.get_status_display }}</span></dd>
+
+                    {% if proposal.valid_until %}
+                    <dt>{% trans "Válido até" %}</dt>
+                    <dd>{{ proposal.valid_until|date:"d/m/Y" }}</dd>
+                    {% endif %}
+
+                    {% if proposal.premium %}
+                    <dt>{% trans "Prêmio" %}</dt>
+                    <dd>R$ {{ proposal.premium|floatformat:2 }}</dd>
+                    {% endif %}
+
+                    <dt>{% trans "Cadastrado em" %}</dt>
+                    <dd>{{ proposal.created_at|date:"d/m/Y H:i" }}</dd>
+
+                    <dt>{% trans "Atualizado em" %}</dt>
+                    <dd>{{ proposal.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+
+                {% if proposal.notes %}
+                <hr style="border:0;border-top:1px solid var(--border);margin:1rem 0;">
+                <h3 style="margin:0 0 .4rem;font-size:.95rem;">{% trans "Observações" %}</h3>
+                <p style="margin:0;color:var(--muted);white-space:pre-wrap;">{{ proposal.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:1.25rem;">
+            <div class="card-head">
+                <h2>{% trans "Itens cobertos" %}</h2>
+                <div class="card-head-right">
+                    <a href="{{ item_create_url }}" class="btn btn-primary btn-sm">+ {% trans "Novo item" %}</a>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Tipo" %}</th>
+                                <th>{% trans "Descrição" %}</th>
+                                <th>{% trans "Valor" %}</th>
+                                <th>{% trans "Ações" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in covered_items %}
+                            <tr>
+                                <td><span class="pill">{{ item.kind_label }}</span></td>
+                                <td>{{ item.description|default:"—" }}
+                                    {% if item.attributes %}<span style="color:var(--muted-soft);font-size:.78rem;"> · {{ item.attributes }}</span>{% endif %}
+                                </td>
+                                <td>{% if item.value %}R$ {{ item.value|floatformat:2 }}{% else %}—{% endif %}</td>
+                                <td>
+                                    <a href="{% url 'proposals:covereditem_update' proposal.pk item.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                                    <a href="{% url 'proposals:covereditem_delete' proposal.pk item.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Excluir" %}">🗑</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="empty-row" style="padding:1.5rem 1rem;">
+                                    {% trans "Nenhum item coberto cadastrado para esta proposta." %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {# --- AI summary placeholder (Sprint 23) --- #}
+        <div class="ai-block">
+            <div class="ai-card">
+                <div class="ai-head">
+                    <div class="ai-icon">✨</div>
+                    <h3>{% trans "Resumo com IA" %}</h3>
+                </div>
+                {% if proposal.ai_summary %}
+                <p class="ai-text">{{ proposal.ai_summary }}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        {% trans "Atualizar resumo" %}
+                    </button>
+                </div>
+                {% else %}
+                <p class="ai-text">{% trans "Gere um resumo automático desta proposta com a IA, conectando cliente, seguradora e itens cobertos." %}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        ✨ {% trans "Resumir com IA" %}
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- Attachments placeholder (Sprint 14) --- #}
+        <div class="ai-block">
+            <div class="attach-card">
+                <h3>📎 {% trans "Anexos" %}</h3>
+                <p>{% trans "Anexos desta proposta serão disponibilizados em breve." %}</p>
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Resumo rápido" %}</h2>
+            </div>
+            <div class="card-body">
+                <p style="margin:0 0 .5rem;color:var(--muted);font-size:.85rem;">
+                    {% blocktrans count counter=covered_items.count %}
+                    {{ counter }} item coberto vinculado a esta proposta.
+                    {% plural %}
+                    {{ counter }} itens cobertos vinculados a esta proposta.
+                    {% endblocktrans %}
+                </p>
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% trans "A funcionalidade \"Gerar apólice\" será disponibilizada na Sprint 12." %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

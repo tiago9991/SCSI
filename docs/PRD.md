@@ -1659,10 +1659,10 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 10 — Propostas
 
-- [ ] Criar app `proposals` com `Proposal` (tenant).
-- [ ] CRUD de propostas com cliente, seguradora, ramo, produtor.
-- [ ] Itens cobertos 1:N na proposta.
-- [ ] Status e validade.
+- [x] Criar app `proposals` com `Proposal` (tenant).
+- [x] CRUD de propostas com cliente, seguradora, ramo, produtor.
+- [x] Itens cobertos 1:N na proposta.
+- [x] Status e validade.
 - [ ] Anexos (Sprint 14).
 
 ### Sprint 11 — Apólices

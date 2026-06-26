@@ -1,0 +1,45 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Esta ação não pode ser desfeita." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'proposals:proposal_list' %}">Propostas</a>
+<a href="{{ detail_url }}">{% trans "Proposta" %} #{{ proposal.pk }}</a>
+<span class="current">{% trans "Excluir" %}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ detail_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="danger-card">
+    {% blocktrans with pk=proposal.pk %}
+    Tem certeza que deseja excluir a <strong>proposta #{{ pk }}</strong>? Todos os dados da proposta e seus itens cobertos serão removidos permanentemente.
+    {% endblocktrans %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="kv">
+            <dt>{% trans "Cliente" %}</dt><dd>{{ proposal.client.full_name }}</dd>
+            <dt>{% trans "Seguradora" %}</dt><dd>{{ proposal.insurance_company.name }}</dd>
+            <dt>{% trans "Ramo" %}</dt><dd>{{ proposal.branch.name }}</dd>
+            <dt>{% trans "Status" %}</dt><dd>{{ proposal.get_status_display }}</dd>
+            {% if proposal.valid_until %}<dt>{% trans "Válido até" %}</dt><dd>{{ proposal.valid_until|date:"d/m/Y" }}</dd>{% endif %}
+            <dt>{% trans "Itens cobertos" %}</dt><dd>{{ proposal.covered_items.count }}</dd>
+        </dl>
+
+        <form method="post" style="margin-top:1rem;">
+            {% csrf_token %}
+            <div class="form-actions">
+                <a href="{{ detail_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-danger">🗑 {% trans "Excluir definitivamente" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
