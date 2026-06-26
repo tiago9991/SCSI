@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'onboarding',
     'clients',
     'catalog',
+    'proposals',
+    'policies',
 ]
 
 MIDDLEWARE = [

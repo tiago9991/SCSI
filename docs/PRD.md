@@ -1653,9 +1653,9 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 9 — Itens Cobertos
 
-- [ ] Criar `ProposalCoveredItem` e `PolicyCoveredItem` (ou model reutilizável conforme design).
-- [ ] Campos: `kind`, `description`, `value`, `attributes` (JSON).
-- [ ] Relacionar com propostas e apólices (1:N).
+- [x] Criar `ProposalCoveredItem` e `PolicyCoveredItem` (ou model reutilizável conforme design).
+- [x] Campos: `kind`, `description`, `value`, `attributes` (JSON).
+- [x] Relacionar com propostas e apólices (1:N).
 
 ### Sprint 10 — Propostas
 
