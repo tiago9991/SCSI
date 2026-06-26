@@ -1,0 +1,66 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Os campos marcados com * são obrigatórios." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'catalog:insurancecompany_list' %}">Seguradoras</a>
+<span class="current">{{ page_title }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="danger-card">
+                <ul style="margin:0;padding-left:1.1rem;">
+                    {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="form-grid">
+                <div class="field" style="grid-column: 1 / -1;">
+                    <label for="id_name">{% trans "Nome" %} <span class="req">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="errorlist">{{ form.name.errors }}</div>{% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_code">{% trans "Código" %}</label>
+                    {{ form.code }}
+                    {% if form.code.errors %}<div class="errorlist">{{ form.code.errors }}</div>{% endif %}
+                    {% if form.code.help_text %}<div class="helptext">{{ form.code.help_text }}</div>{% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_document">CNPJ</label>
+                    {{ form.document }}
+                    {% if form.document.errors %}<div class="errorlist">{{ form.document.errors }}</div>{% endif %}
+                    {% if form.document.help_text %}<div class="helptext">{{ form.document.help_text }}</div>{% endif %}
+                </div>
+
+                <div class="field" style="grid-column: 1 / -1;">
+                    <label for="id_contact">{% trans "Contato" %}</label>
+                    {{ form.contact }}
+                    {% if form.contact.errors %}<div class="errorlist">{{ form.contact.errors }}</div>{% endif %}
+                    {% if form.contact.help_text %}<div class="helptext">{{ form.contact.help_text }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ list_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-primary">{% trans submit_label %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

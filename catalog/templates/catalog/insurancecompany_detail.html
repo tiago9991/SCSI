@@ -1,0 +1,69 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ insurance_company.name }}{% endblock %}
+{% block page_title %}{{ insurance_company.name }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes da seguradora" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'catalog:insurancecompany_list' %}">Seguradoras</a>
+<span class="current">{{ insurance_company.name }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Dados da seguradora" %}</h2>
+            </div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Nome" %}</dt>
+                    <dd>{{ insurance_company.name }}</dd>
+
+                    {% if insurance_company.code %}
+                    <dt>{% trans "Código" %}</dt>
+                    <dd>{{ insurance_company.code }}</dd>
+                    {% endif %}
+
+                    {% if insurance_company.document %}
+                    <dt>CNPJ</dt>
+                    <dd>{{ insurance_company.document }}</dd>
+                    {% endif %}
+
+                    {% if insurance_company.contact %}
+                    <dt>{% trans "Contato" %}</dt>
+                    <dd>{{ insurance_company.contact }}</dd>
+                    {% endif %}
+
+                    <dt>{% trans "Cadastrado em" %}</dt>
+                    <dd>{{ insurance_company.created_at|date:"d/m/Y H:i" }}</dd>
+
+                    <dt>{% trans "Atualizado em" %}</dt>
+                    <dd>{{ insurance_company.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Resumo rápido" %}</h2>
+            </div>
+            <div class="card-body">
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% trans "As propostas e apólices vinculadas a esta seguradora serão listadas aqui assim que os módulos correspondentes forem habilitados." %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

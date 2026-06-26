@@ -35,4 +35,5 @@ urlpatterns = [
 
     # --- Domain apps ---
     path('', include('clients.urls')),
+    path('', include('catalog.urls')),
 ]

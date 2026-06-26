@@ -1646,10 +1646,10 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 8 — Seguradoras e Ramos
 
-- [ ] Criar app `catalog`.
-- [ ] CRUD de `InsuranceCompany`.
-- [ ] CRUD de `Branch` (auto, residencial, vida, viagem, empresarial, frota, outros).
-- [ ] CRUD de `Coverage` por ramo.
+- [x] Criar app `catalog`.
+- [x] CRUD de `InsuranceCompany`.
+- [x] CRUD de `Branch` (auto, residencial, vida, viagem, empresarial, frota, outros).
+- [x] CRUD de `Coverage` por ramo.
 
 ### Sprint 9 — Itens Cobertos
 

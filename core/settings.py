@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'base',
     'onboarding',
     'clients',
+    'catalog',
 ]
 
 MIDDLEWARE = [

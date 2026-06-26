@@ -1,0 +1,100 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Seguradoras" %}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Gerencie as seguradoras disponíveis para a sua corretora." %}{% endblock %}
+
+{% block breadcrumb %}
+<span class="current">Seguradoras</span>
+{% endblock %}
+
+{% block page_actions %}
+{% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova seguradora" %}</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="get" class="toolbar">
+    <div class="search-input">
+        <span class="ico">⌕ {% trans "Buscar" %}</span>
+        <input type="search" name="q" value="{{ search|default:'' }}" placeholder="{% trans "Busque por nome, código, CNPJ ou contato..." %}">
+    </div>
+    {% if search %}
+    <a href="{% url 'catalog:insurancecompany_list' %}" class="btn btn-outline btn-sm">✕ {% trans "Limpar" %}</a>
+    {% endif %}
+</form>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>{% trans "Nome" %}</th>
+                    <th>{% trans "Código" %}</th>
+                    <th>CNPJ</th>
+                    <th>{% trans "Contato" %}</th>
+                    <th class="text-right">{% trans "Ações" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in insurance_companies %}
+                <tr>
+                    <td>
+                        <a href="{% url 'catalog:insurancecompany_detail' company.pk %}" class="row-link">{{ company.name }}</a>
+                    </td>
+                    <td>{{ company.code|default:"—" }}</td>
+                    <td>{{ company.document|default:"—" }}</td>
+                    <td>{{ company.contact|default:"—" }}</td>
+                    <td class="text-right">
+                        <a href="{% url 'catalog:insurancecompany_detail' company.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                        <a href="{% url 'catalog:insurancecompany_update' company.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-row">
+                        <div class="empty-state">
+                            <div class="illustration">🏢</div>
+                            <h3>{% trans "Nenhuma seguradora ainda" %}</h3>
+                            <p>Cadastre as seguradoras que a sua corretora trabalha para usá-las em propostas e apólices.</p>
+                            {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova seguradora" %}</a>{% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="info">
+            {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+            Mostrando {{ start }}–{{ end }} de {{ total }} seguradoras
+            {% endblocktrans %}
+        </span>
+        <div class="pages">
+            {% if page_obj.has_previous %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
+            {% else %}
+            <span>«</span>
+            {% endif %}
+
+            {% for n in page_obj.paginator.page_range %}
+                {% if n == page_obj.number %}
+                <span class="active">{{ n }}</span>
+                {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+                <a href="?{% if search %}q={{ search }}&{% endif %}page={{ n }}">{{ n }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+            {% else %}
+            <span>»</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

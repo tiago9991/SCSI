@@ -1,0 +1,107 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Coberturas" %}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Gerencie as coberturas por ramo de seguro." %}{% endblock %}
+
+{% block breadcrumb %}
+<span class="current">Coberturas</span>
+{% endblock %}
+
+{% block page_actions %}
+{% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova cobertura" %}</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="get" class="toolbar">
+    <div class="search-input">
+        <span class="ico">⌕ {% trans "Buscar" %}</span>
+        <input type="search" name="q" value="{{ search|default:'' }}" placeholder="{% trans "Busque por nome ou descrição..." %}">
+    </div>
+    <select name="branch" class="select" style="min-width:200px;">
+        <option value="">{% trans "Todos os ramos" %}</option>
+        {% for branch in branches %}
+        <option value="{{ branch.pk }}" {% if selected_branch|stringformat:"s" == branch.pk|stringformat:"s" %}selected{% endif %}>{{ branch.name }}</option>
+        {% endfor %}
+    </select>
+    {% if search or selected_branch %}
+    <a href="{% url 'catalog:coverage_list' %}" class="btn btn-outline btn-sm">✕ {% trans "Limpar" %}</a>
+    {% endif %}
+    <button type="submit" class="btn btn-outline btn-sm">{% trans "Filtrar" %}</button>
+</form>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>{% trans "Nome" %}</th>
+                    <th>{% trans "Ramo" %}</th>
+                    <th>{% trans "Cadastrado em" %}</th>
+                    <th class="text-right">{% trans "Ações" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coverage in coverages %}
+                <tr>
+                    <td>
+                        <a href="{% url 'catalog:coverage_detail' coverage.pk %}" class="row-link">{{ coverage.name }}</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'catalog:branch_detail' coverage.branch_id %}">{{ coverage.branch.name }}</a>
+                    </td>
+                    <td>{{ coverage.created_at|date:"d/m/Y" }}</td>
+                    <td class="text-right">
+                        <a href="{% url 'catalog:coverage_detail' coverage.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                        <a href="{% url 'catalog:coverage_update' coverage.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-row">
+                        <div class="empty-state">
+                            <div class="illustration">🛡</div>
+                            <h3>{% trans "Nenhuma cobertura ainda" %}</h3>
+                            <p>Crie coberturas para os ramos de seguro da sua corretora (ex.: colisão, incêndio, roubo...).</p>
+                            {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova cobertura" %}</a>{% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="info">
+            {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+            Mostrando {{ start }}–{{ end }} de {{ total }} coberturas
+            {% endblocktrans %}
+        </span>
+        <div class="pages">
+            {% if page_obj.has_previous %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_branch %}branch={{ selected_branch }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
+            {% else %}
+            <span>«</span>
+            {% endif %}
+
+            {% for n in page_obj.paginator.page_range %}
+                {% if n == page_obj.number %}
+                <span class="active">{{ n }}</span>
+                {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+                <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_branch %}branch={{ selected_branch }}&{% endif %}page={{ n }}">{{ n }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_branch %}branch={{ selected_branch }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+            {% else %}
+            <span>»</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
