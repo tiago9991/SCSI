@@ -1667,9 +1667,9 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 11 — Apólices
 
-- [ ] Criar app `policies` com `Policy` (tenant).
-- [ ] CRUD de apólices com itens cobertos.
-- [ ] Campos de número, vigência, premium, status.
+- [x] Criar app `policies` com `Policy` (tenant).
+- [x] CRUD de apólices com itens cobertos.
+- [x] Campos de número, vigência, premium, status.
 
 ### Sprint 12 — Geração de Apólice a partir da Proposta
 

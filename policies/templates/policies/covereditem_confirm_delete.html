@@ -1,0 +1,43 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Esta ação não pode ser desfeita." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'policies:policy_list' %}">Apólices</a>
+<a href="{% url 'policies:policy_detail' policy.pk %}">{% if policy.number %}{{ policy.number }}{% else %}{% trans "Apólice" %} #{{ policy.pk }}{% endif %}</a>
+<span class="current">{% trans "Excluir item" %}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="danger-card">
+    {% blocktrans with kind=object.kind_label desc=object.description %}
+    Tem certeza que deseja excluir o item coberto <strong>{{ kind }} · {{ desc }}</strong>? Esta ação não pode ser desfeita.
+    {% endblocktrans %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="kv">
+            <dt>{% trans "Tipo" %}</dt><dd>{{ object.kind_label }}</dd>
+            <dt>{% trans "Descrição" %}</dt><dd>{{ object.description|default:"—" }}</dd>
+            {% if object.value %}<dt>{% trans "Valor" %}</dt><dd>R$ {{ object.value|floatformat:2 }}</dd>{% endif %}
+            {% if object.attributes %}<dt>{% trans "Atributos" %}</dt><dd>{{ object.attributes }}</dd>{% endif %}
+        </dl>
+
+        <form method="post" style="margin-top:1rem;">
+            {% csrf_token %}
+            <div class="form-actions">
+                <a href="{{ list_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-danger">🗑 {% trans "Excluir definitivamente" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

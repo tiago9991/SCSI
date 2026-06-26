@@ -1,0 +1,115 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Apólices" %}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Cadastre e acompanhe as apólices de seguro da corretora." %}{% endblock %}
+
+{% block breadcrumb %}
+<span class="current">Apólices</span>
+{% endblock %}
+
+{% block page_actions %}
+{% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova apólice" %}</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="get" class="toolbar">
+    <div class="search-input">
+        <span class="ico">⌕ {% trans "Buscar" %}</span>
+        <input type="search" name="q" value="{{ search|default:'' }}" placeholder="{% trans "Busque por número, cliente ou seguradora..." %}">
+    </div>
+    <select name="status" class="select" style="min-width:180px;">
+        <option value="">{% trans "Todos os status" %}</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    {% if search or selected_status %}
+    <a href="{% url 'policies:policy_list' %}" class="btn btn-outline btn-sm">✕ {% trans "Limpar" %}</a>
+    {% endif %}
+    <button type="submit" class="btn btn-outline btn-sm">{% trans "Filtrar" %}</button>
+</form>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>{% trans "Número" %}</th>
+                    <th>{% trans "Cliente" %}</th>
+                    <th>{% trans "Seguradora" %}</th>
+                    <th>{% trans "Ramo" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Vigência" %}</th>
+                    <th class="text-right">{% trans "Ações" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy in policies %}
+                <tr>
+                    <td>
+                        <a href="{% url 'policies:policy_detail' policy.pk %}" class="row-link">{{ policy.number|default:"—" }}</a>
+                    </td>
+                    <td>{{ policy.client.full_name }}</td>
+                    <td>{{ policy.insurance_company.name|default:"—" }}</td>
+                    <td>{{ policy.branch.name|default:"—" }}</td>
+                    <td><span class="pill">{{ policy.get_status_display }}</span></td>
+                    <td>
+                        {% if policy.start_date or policy.end_date %}
+                        {{ policy.start_date|date:"d/m/Y"|default:"—" }} → {{ policy.end_date|date:"d/m/Y"|default:"—" }}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="text-right">
+                        <a href="{% url 'policies:policy_detail' policy.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                        <a href="{% url 'policies:policy_update' policy.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-row">
+                        <div class="empty-state">
+                            <div class="illustration">📜</div>
+                            <h3>{% trans "Nenhuma apólice ainda" %}</h3>
+                            <p>Crie a primeira apólice ou gere uma a partir de uma proposta aceita.</p>
+                            {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova apólice" %}</a>{% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="info">
+            {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+            Mostrando {{ start }}–{{ end }} de {{ total }} apólices
+            {% endblocktrans %}
+        </span>
+        <div class="pages">
+            {% if page_obj.has_previous %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
+            {% else %}
+            <span>«</span>
+            {% endif %}
+
+            {% for n in page_obj.paginator.page_range %}
+                {% if n == page_obj.number %}
+                <span class="active">{{ n }}</span>
+                {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+                <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}page={{ n }}">{{ n }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+            {% else %}
+            <span>»</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

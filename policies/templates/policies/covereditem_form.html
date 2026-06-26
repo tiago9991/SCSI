@@ -1,0 +1,65 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Objeto segurado vinculado à apólice" %} · {{ policy.number|default:"#" }}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'policies:policy_list' %}">Apólices</a>
+<a href="{% url 'policies:policy_detail' policy.pk %}">{% if policy.number %}{{ policy.number }}{% else %}{% trans "Apólice" %} #{{ policy.pk }}{% endif %}</a>
+<span class="current">{{ page_title }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="danger-card">
+                <ul style="margin:0;padding-left:1.1rem;">
+                    {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="id_kind">{% trans "Tipo" %} <span class="req">*</span></label>
+                    {{ form.kind }}
+                    {% if form.kind.errors %}<div class="errorlist">{{ form.kind.errors }}</div>{% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_value">{% trans "Valor" %}</label>
+                    {{ form.value }}
+                    {% if form.value.errors %}<div class="errorlist">{{ form.value.errors }}</div>{% endif %}
+                </div>
+
+                <div class="field" style="grid-column: 1 / -1;">
+                    <label for="id_description">{% trans "Descrição" %}</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<div class="errorlist">{{ form.description.errors }}</div>{% endif %}
+                </div>
+
+                <div class="field" style="grid-column: 1 / -1;">
+                    <label for="id_attributes_text">{% trans "Atributos (JSON)" %}</label>
+                    {{ form.attributes_text }}
+                    {% if form.attributes_text.errors %}<div class="errorlist">{{ form.attributes_text.errors }}</div>{% endif %}
+                    {% if form.attributes_text.help_text %}<div class="helptext">{{ form.attributes_text.help_text }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ list_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-primary">{% trans submit_label %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
