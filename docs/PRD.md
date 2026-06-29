@@ -1694,9 +1694,9 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 15 — CRM Grid
 
-- [ ] Criar app `crm` com `Pipeline`, `PipelineStage`, `Deal`.
-- [ ] Tela grid de negociações com filtros e ordenação.
-- [ ] CRUD de negociações.
+- [x] Criar app `crm` com `Pipeline`, `PipelineStage`, `Deal`.
+- [x] Tela grid de negociações com filtros e ordenação.
+- [x] CRUD de negociações.
 
 ### Sprint 16 — CRM Kanban
 

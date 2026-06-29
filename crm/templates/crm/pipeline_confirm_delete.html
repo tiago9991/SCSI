@@ -1,0 +1,42 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Esta ação não pode ser desfeita." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'crm:pipeline_list' %}">Pipelines</a>
+<a href="{{ detail_url }}">{{ pipeline.name }}</a>
+<span class="current">{% trans "Excluir" %}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ detail_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="danger-card">
+    {% blocktrans with name=pipeline.name %}
+    Tem certeza que deseja excluir o pipeline <strong>{{ name }}</strong>? Todas as etapas vinculadas serão removidas. As negociações vinculadas às etapas não serão excluídas, mas ficarão sem etapa até serem reatribuídas.
+    {% endblocktrans %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="kv">
+            <dt>{% trans "Nome" %}</dt><dd>{{ pipeline.name }}</dd>
+            <dt>{% trans "Padrão" %}</dt><dd>{% if pipeline.is_default %}{% trans "Sim" %}{% else %}—{% endif %}</dd>
+            <dt>{% trans "Etapas" %}</dt><dd>{{ pipeline.stages.count }}</dd>
+        </dl>
+
+        <form method="post" style="margin-top:1rem;">
+            {% csrf_token %}
+            <div class="form-actions">
+                <a href="{{ detail_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-danger">🗑 {% trans "Excluir definitivamente" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

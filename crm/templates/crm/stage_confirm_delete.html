@@ -1,0 +1,45 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Esta ação não pode ser desfeita." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'crm:pipeline_list' %}">Pipelines</a>
+<a href="{{ list_url }}">{{ pipelinestage.pipeline.name|default:"—" }}</a>
+<span class="current">{% trans "Excluir etapa" %}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="danger-card">
+    {% blocktrans with name=pipelinestage.name %}
+    Tem certeza que deseja excluir a etapa <strong>{{ name }}</strong>? As negociações vinculadas ficarão sem etapa até serem reatribuídas.
+    {% endblocktrans %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="kv">
+            <dt>{% trans "Pipeline" %}</dt><dd>{{ pipelinestage.pipeline.name }}</dd>
+            <dt>{% trans "Nome" %}</dt><dd>{{ pipelinestage.name }}</dd>
+            <dt>{% trans "Cor" %}</dt>
+            <dd><span style="display:inline-block;width:18px;height:18px;border-radius:4px;background:{{ pipelinestage.color }};border:1px solid var(--border);vertical-align:middle;"></span> {{ pipelinestage.color }}</dd>
+            <dt>{% trans "Ordem" %}</dt><dd>{{ pipelinestage.order }}</dd>
+            <dt>{% trans "Negociações" %}</dt><dd>{{ pipelinestage.deals.count }}</dd>
+        </dl>
+
+        <form method="post" style="margin-top:1rem;">
+            {% csrf_token %}
+            <div class="form-actions">
+                <a href="{{ list_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-danger">🗑 {% trans "Excluir definitivamente" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

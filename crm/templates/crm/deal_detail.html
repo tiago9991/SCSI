@@ -1,0 +1,109 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes da negociação" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'crm:deal_list' %}">CRM</a>
+<span class="current">{{ deal.title }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Dados da negociação" %}</h2>
+            </div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Título" %}</dt>
+                    <dd>{{ deal.title }}</dd>
+
+                    <dt>{% trans "Cliente" %}</dt>
+                    <dd><a href="{% url 'clients:client_detail' deal.client_id %}">{{ deal.client.full_name }}</a></dd>
+
+                    <dt>{% trans "Etapa" %}</dt>
+                    <dd>
+                        <span class="pill" style="background:{{ deal.stage.color }}22;color:{{ deal.stage.color }};">{{ deal.stage.name }}</span>
+                        <span style="color:var(--muted);font-size:.82rem;"> · {{ deal.stage.pipeline }}</span>
+                    </dd>
+
+                    <dt>{% trans "Status" %}</dt>
+                    <dd><span class="pill">{{ deal.get_status_display }}</span></dd>
+
+                    {% if deal.amount %}
+                    <dt>{% trans "Valor" %}</dt>
+                    <dd>R$ {{ deal.amount|floatformat:2 }}</dd>
+                    {% endif %}
+
+                    {% if deal.expected_close_date %}
+                    <dt>{% trans "Fechamento previsto" %}</dt>
+                    <dd>{{ deal.expected_close_date|date:"d/m/Y" }}</dd>
+                    {% endif %}
+
+                    <dt>{% trans "Cadastrado em" %}</dt>
+                    <dd>{{ deal.created_at|date:"d/m/Y H:i" }}</dd>
+
+                    <dt>{% trans "Atualizado em" %}</dt>
+                    <dd>{{ deal.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        {# --- AI summary placeholder (Sprint 23) --- #}
+        <div class="ai-block">
+            <div class="ai-card">
+                <div class="ai-head">
+                    <div class="ai-icon">✨</div>
+                    <h3>{% trans "Resumo com IA" %}</h3>
+                </div>
+                {% if deal.ai_summary %}
+                <p class="ai-text">{{ deal.ai_summary }}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        {% trans "Atualizar resumo" %}
+                    </button>
+                </div>
+                {% else %}
+                <p class="ai-text">{% trans "Gere um resumo automático desta negociação com a IA, conectando cliente, etapa e valor." %}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        ✨ {% trans "Resumir com IA" %}
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- Attachments (Sprint 14) --- #}
+        {% include "attachments/_attachments_panel.html" %}
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Resumo rápido" %}</h2>
+            </div>
+            <div class="card-body">
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% blocktrans with stage=deal.stage.name pipeline=deal.stage.pipeline %}
+                    Etapa <strong>{{ stage }}</strong> do pipeline <strong>{{ pipeline }}</strong>.
+                    {% endblocktrans %}
+                </p>
+                <p style="margin:.5rem 0 0;color:var(--muted);font-size:.85rem;">
+                    {% trans "Arrastar cards entre etapas estará disponível na visão Kanban (Sprint 16)." %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

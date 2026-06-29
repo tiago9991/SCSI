@@ -1,0 +1,105 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes do pipeline" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'crm:pipeline_list' %}">Pipelines</a>
+<span class="current">{{ pipeline.name }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Dados do pipeline" %}</h2>
+            </div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Nome" %}</dt>
+                    <dd>{{ pipeline.name }}</dd>
+
+                    <dt>{% trans "Padrão" %}</dt>
+                    <dd>{% if pipeline.is_default %}<span class="pill">★ {% trans "Padrão" %}</span>{% else %}—{% endif %}</dd>
+
+                    <dt>{% trans "Cadastrado em" %}</dt>
+                    <dd>{{ pipeline.created_at|date:"d/m/Y H:i" }}</dd>
+
+                    <dt>{% trans "Atualizado em" %}</dt>
+                    <dd>{{ pipeline.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:1.25rem;">
+            <div class="card-head">
+                <h2>{% trans "Etapas" %}</h2>
+                <div class="card-head-right">
+                    <a href="{{ stage_create_url }}?pipeline={{ pipeline.pk }}" class="btn btn-primary btn-sm">+ {% trans "Nova etapa" %}</a>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Ordem" %}</th>
+                                <th>{% trans "Nome" %}</th>
+                                <th>{% trans "Cor" %}</th>
+                                <th>{% trans "Negociações" %}</th>
+                                <th class="text-right">{% trans "Ações" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stage in stages %}
+                            <tr>
+                                <td>{{ stage.order }}</td>
+                                <td><span class="pill" style="background:{{ stage.color }}22;color:{{ stage.color }};">{{ stage.name }}</span></td>
+                                <td><span style="display:inline-block;width:18px;height:18px;border-radius:4px;background:{{ stage.color }};border:1px solid var(--border);vertical-align:middle;"></span> {{ stage.color }}</td>
+                                <td>{{ stage.deals.count }}</td>
+                                <td class="text-right">
+                                    <a href="{% url 'crm:stage_update' stage.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                                    <a href="{% url 'crm:stage_delete' stage.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Excluir" %}">🗑</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="empty-row" style="padding:1.5rem 1rem;">
+                                    {% trans "Nenhuma etapa cadastrada para este pipeline." %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Resumo rápido" %}</h2>
+            </div>
+            <div class="card-body">
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% blocktrans count counter=stages.count %}
+                    {{ counter }} etapa neste pipeline.
+                    {% plural %}
+                    {{ counter }} etapas neste pipeline.
+                    {% endblocktrans %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}
