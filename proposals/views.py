@@ -9,15 +9,19 @@ each proposal (1:N). The ``producer`` FK (commercial.Producer, PRD §16.5) is no
 rendered yet — it lands in Sprint 19 once the ``commercial`` app is created.
 """
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from base.views import TenantViewMixin
 from proposals.forms import ProposalCoveredItemForm, ProposalForm
 from proposals.models import Proposal, ProposalCoveredItem
+from proposals.services import (
+    ProposalNotAcceptedError,
+    generate_policy_from_proposal,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -74,6 +78,10 @@ class ProposalDetailView(TenantViewMixin, DetailView):
             self.object.covered_items.for_tenant(self.request.tenant).order_by('-id')
         )
         ctx['item_create_url'] = reverse_lazy('proposals:covereditem_create', args=[self.object.pk])
+        ctx['generate_policy_url'] = reverse_lazy(
+            'proposals:proposal_generate_policy', args=[self.object.pk]
+        )
+        ctx['can_generate_policy'] = self.object.status == Proposal.STATUS_ACCEPTED
         return ctx
 
 
@@ -209,3 +217,44 @@ class ProposalCoveredItemDeleteView(TenantViewMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('proposals:proposal_detail', args=[self.object.proposal_id])
+
+
+# ---------------------------------------------------------------------------
+# Generate policy from a proposal (Sprint 12 — PRD §20.2)
+# ---------------------------------------------------------------------------
+class ProposalGeneratePolicyView(TenantViewMixin, View):
+    """POST-only action that turns an accepted proposal into a policy.
+
+    Resolves the proposal through the tenant-scoped queryset (so a pk from
+    another brokerage returns 404), delegates the heavy lifting to the service
+    layer and redirects to the freshly created policy detail page. Only
+    proposals with ``status=aceita`` are accepted; anything else surfaces a
+    friendly error message and bounces back to the proposal detail.
+    """
+
+    def get_object(self):
+        qs = Proposal.objects.for_tenant(self.request.tenant)
+        return get_object_or_404(qs, pk=self.kwargs['pk'])
+
+    def post(self, request, *args, **kwargs):
+        proposal = self.get_object()
+        try:
+            policy = generate_policy_from_proposal(proposal)
+        except ProposalNotAcceptedError as exc:
+            from django.contrib import messages
+            messages.error(request, str(exc))
+            return redirect('proposals:proposal_detail', pk=proposal.pk)
+        from django.contrib import messages
+        messages.success(
+            request,
+            _('Apólice "%(number)s" gerada a partir da proposta #%(proposal_id)s.') % {
+                'number': policy.number,
+                'proposal_id': proposal.pk,
+            },
+        )
+        return redirect('policies:policy_detail', pk=policy.pk)
+
+    def get(self, request, *args, **kwargs):
+        # The "Gerar apólice" button is a POST form; direct GETs are not
+        # supported to avoid accidental generation on refresh/back.
+        return redirect('proposals:proposal_detail', pk=kwargs['pk'])

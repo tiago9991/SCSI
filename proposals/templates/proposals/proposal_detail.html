@@ -14,6 +14,14 @@
 <a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
 <a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
 <a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% if can_generate_policy %}
+<form method="post" action="{{ generate_policy_url }}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-sm" title="{% trans "Cria uma apólice a partir desta proposta aceita" %}">
+        📜 {% trans "Gerar apólice" %}
+    </button>
+</form>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -153,9 +161,15 @@
                     {{ counter }} itens cobertos vinculados a esta proposta.
                     {% endblocktrans %}
                 </p>
+                {% if can_generate_policy %}
                 <p style="margin:0;color:var(--muted);font-size:.85rem;">
-                    {% trans "A funcionalidade \"Gerar apólice\" será disponibilizada na Sprint 12." %}
+                    {% trans "Esta proposta está aceita: clique em \"Gerar apólice\" para criar a apólice correspondente." %}
                 </p>
+                {% else %}
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% trans "Marque a proposta como \"Aceita\" para liberar o botão \"Gerar apólice\"." %}
+                </p>
+                {% endif %}
             </div>
         </div>
     </aside>

@@ -8,6 +8,7 @@ from proposals.views import (
     ProposalCreateView,
     ProposalDeleteView,
     ProposalDetailView,
+    ProposalGeneratePolicyView,
     ProposalListView,
     ProposalUpdateView,
 )
@@ -22,6 +23,8 @@ urlpatterns = [
     path('propostas/<int:pk>/', ProposalDetailView.as_view(), name='proposal_detail'),
     path('propostas/<int:pk>/editar/', ProposalUpdateView.as_view(), name='proposal_update'),
     path('propostas/<int:pk>/excluir/', ProposalDeleteView.as_view(), name='proposal_delete'),
+    path('propostas/<int:pk>/gerar-apolice/',
+         ProposalGeneratePolicyView.as_view(), name='proposal_generate_policy'),
 
     # --- Covered items nested under a proposal (1:N) ---
     path('propostas/<int:proposal_pk>/itens/novo/',

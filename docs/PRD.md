@@ -1673,10 +1673,10 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 12 — Geração de Apólice a partir da Proposta
 
-- [ ] Botão "Gerar apólice" na proposta.
-- [ ] Lógica de serviço que cria `Policy` + copia `ProposalCoveredItem` → `PolicyCoveredItem`.
-- [ ] Mantém vínculo `proposal` na apólice.
-- [ ] Testes manuais do fluxo.
+- [x] Botão "Gerar apólice" na proposta.
+- [x] Lógica de serviço que cria `Policy` + copia `ProposalCoveredItem` → `PolicyCoveredItem`.
+- [x] Mantém vínculo `proposal` na apólice.
+- [x] Testes manuais do fluxo.
 
 ### Sprint 13 — Sinistros
 
