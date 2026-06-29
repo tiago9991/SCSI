@@ -1680,9 +1680,9 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 13 — Sinistros
 
-- [ ] Criar app `claims` com `Claim` (tenant).
-- [ ] Sinistro vinculado a `Policy` + `PolicyCoveredItem`.
-- [ ] CRUD com status e valor.
+- [x] Criar app `claims` com `Claim` (tenant).
+- [x] Sinistro vinculado a `Policy` + `PolicyCoveredItem`.
+- [x] CRUD com status e valor.
 - [ ] Anexos (Sprint 14).
 
 ### Sprint 14 — Anexos Privados

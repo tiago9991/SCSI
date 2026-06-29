@@ -1,0 +1,118 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Sinistros" %}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Cadastre e acompanhe os sinistros da corretora." %}{% endblock %}
+
+{% block breadcrumb %}
+<span class="current">Sinistros</span>
+{% endblock %}
+
+{% block page_actions %}
+{% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Novo sinistro" %}</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="get" class="toolbar">
+    <div class="search-input">
+        <span class="ico">⌕ {% trans "Buscar" %}</span>
+        <input type="search" name="q" value="{{ search|default:'' }}" placeholder="{% trans "Busque por número, cliente, apólice ou descrição..." %}">
+    </div>
+    <select name="status" class="select" style="min-width:180px;">
+        <option value="">{% trans "Todos os status" %}</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <input type="number" name="policy" value="{{ selected_policy|default:'' }}" placeholder="{% trans "Apólice #ID" %}" min="1" style="padding:.5rem .75rem;font-size:.88rem;border:1px solid var(--border);border-radius:8px;width:130px;">
+    {% if search or selected_status or selected_policy %}
+    <a href="{% url 'claims:claim_list' %}" class="btn btn-outline btn-sm">✕ {% trans "Limpar" %}</a>
+    {% endif %}
+    <button type="submit" class="btn btn-outline btn-sm">{% trans "Filtrar" %}</button>
+</form>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>{% trans "Número" %}</th>
+                    <th>{% trans "Cliente" %}</th>
+                    <th>{% trans "Apólice" %}</th>
+                    <th>{% trans "Item coberto" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Ocorrência" %}</th>
+                    <th class="text-right">{% trans "Valor" %}</th>
+                    <th class="text-right">{% trans "Ações" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                <tr>
+                    <td>
+                        <a href="{% url 'claims:claim_detail' claim.pk %}" class="row-link">{{ claim.number|default:"—" }}</a>
+                    </td>
+                    <td>{{ claim.client.full_name }}</td>
+                    <td>
+                        {% if claim.policy_id %}
+                        <a href="{% url 'policies:policy_detail' claim.policy_id %}">{% if claim.policy.number %}{{ claim.policy.number }}{% else %}#{{ claim.policy_id }}{% endif %}</a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ claim.covered_item.kind_label|default:"—" }}</td>
+                    <td><span class="pill">{{ claim.get_status_display }}</span></td>
+                    <td>{{ claim.occurrence_date|date:"d/m/Y"|default:"—" }}</td>
+                    <td class="text-right">{% if claim.amount %}R$ {{ claim.amount|floatformat:2 }}{% else %}—{% endif %}</td>
+                    <td class="text-right">
+                        <a href="{% url 'claims:claim_detail' claim.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                        <a href="{% url 'claims:claim_update' claim.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="empty-row">
+                        <div class="empty-state">
+                            <div class="illustration">🚨</div>
+                            <h3>{% trans "Nenhum sinistro ainda" %}</h3>
+                            <p>Registre o primeiro sinistro vinculado a uma apólice e ao item coberto correspondente.</p>
+                            {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Novo sinistro" %}</a>{% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="info">
+            {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+            Mostrando {{ start }}–{{ end }} de {{ total }} sinistros
+            {% endblocktrans %}
+        </span>
+        <div class="pages">
+            {% if page_obj.has_previous %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_policy %}policy={{ selected_policy }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
+            {% else %}
+            <span>«</span>
+            {% endif %}
+
+            {% for n in page_obj.paginator.page_range %}
+                {% if n == page_obj.number %}
+                <span class="active">{{ n }}</span>
+                {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+                <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_policy %}policy={{ selected_policy }}&{% endif %}page={{ n }}">{{ n }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_policy %}policy={{ selected_policy }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+            {% else %}
+            <span>»</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

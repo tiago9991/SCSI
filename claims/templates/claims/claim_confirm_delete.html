@@ -1,0 +1,46 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Esta ação não pode ser desfeita." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'claims:claim_list' %}">Sinistros</a>
+<a href="{{ detail_url }}">{% if claim.number %}{{ claim.number }}{% else %}{% trans "Sinistro" %} #{{ claim.pk }}{% endif %}</a>
+<span class="current">{% trans "Excluir" %}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ detail_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="danger-card">
+    {% blocktrans with pk=claim.pk %}
+    Tem certeza que deseja excluir o <strong>sinistro #{{ pk }}</strong>? Todos os dados do sinistro serão removidos permanentemente.
+    {% endblocktrans %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="kv">
+            <dt>{% trans "Número" %}</dt><dd>{{ claim.number|default:"—" }}</dd>
+            <dt>{% trans "Apólice" %}</dt><dd>{{ claim.policy.number|default:claim.policy_id }}</dd>
+            <dt>{% trans "Item coberto" %}</dt><dd>{{ claim.covered_item.kind_label }}</dd>
+            <dt>{% trans "Cliente" %}</dt><dd>{{ claim.client.full_name }}</dd>
+            <dt>{% trans "Status" %}</dt><dd>{{ claim.get_status_display }}</dd>
+            {% if claim.occurrence_date %}<dt>{% trans "Ocorrência" %}</dt><dd>{{ claim.occurrence_date|date:"d/m/Y" }}</dd>{% endif %}
+            {% if claim.amount %}<dt>{% trans "Valor" %}</dt><dd>R$ {{ claim.amount|floatformat:2 }}</dd>{% endif %}
+        </dl>
+
+        <form method="post" style="margin-top:1rem;">
+            {% csrf_token %}
+            <div class="form-actions">
+                <a href="{{ detail_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-danger">🗑 {% trans "Excluir definitivamente" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

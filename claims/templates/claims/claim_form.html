@@ -1,0 +1,85 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Os campos marcados com * são obrigatórios." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'claims:claim_list' %}">Sinistros</a>
+<span class="current">{{ page_title }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">↩ {% trans "Cancelar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="danger-card">
+                <ul style="margin:0;padding-left:1.1rem;">
+                    {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="id_policy">{% trans "Apólice" %} <span class="req">*</span></label>
+                    {{ form.policy }}
+                    {% if form.policy.errors %}<div class="errorlist">{{ form.policy.errors }}</div>{% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_covered_item">{% trans "Item coberto" %} <span class="req">*</span></label>
+                    {{ form.covered_item }}
+                    {% if form.covered_item.errors %}<div class="errorlist">{{ form.covered_item.errors }}</div>{% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_client">{% trans "Cliente" %} <span class="req">*</span></label>
+                    {{ form.client }}
+                    {% if form.client.errors %}<div class="errorlist">{{ form.client.errors }}</div>{% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_number">{% trans "Número" %}</label>
+                    {{ form.number }}
+                    {% if form.number.errors %}<div class="errorlist">{{ form.number.errors }}</div>{% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_occurrence_date">{% trans "Data da ocorrência" %}</label>
+                    {{ form.occurrence_date }}
+                    {% if form.occurrence_date.errors %}<div class="errorlist">{{ form.occurrence_date.errors }}</div>{% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_status">{% trans "Status" %} <span class="req">*</span></label>
+                    {{ form.status }}
+                    {% if form.status.errors %}<div class="errorlist">{{ form.status.errors }}</div>{% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_amount">{% trans "Valor" %}</label>
+                    {{ form.amount }}
+                    {% if form.amount.errors %}<div class="errorlist">{{ form.amount.errors }}</div>{% endif %}
+                </div>
+
+                <div class="field" style="grid-column: 1 / -1;">
+                    <label for="id_description">{% trans "Descrição" %}</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<div class="errorlist">{{ form.description.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ list_url }}" class="btn btn-ghost">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-primary">{% trans submit_label %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

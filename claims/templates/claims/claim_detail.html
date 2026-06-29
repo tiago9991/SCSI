@@ -1,0 +1,118 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes do sinistro" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'claims:claim_list' %}">Sinistros</a>
+<span class="current">{% if claim.number %}{{ claim.number }}{% else %}{% trans "Sinistro" %} #{{ claim.pk }}{% endif %}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Dados do sinistro" %}</h2>
+            </div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Número" %}</dt>
+                    <dd>{{ claim.number|default:"—" }}</dd>
+
+                    <dt>{% trans "Apólice" %}</dt>
+                    <dd><a href="{% url 'policies:policy_detail' claim.policy_id %}">{% if claim.policy.number %}{{ claim.policy.number }}{% else %}#{{ claim.policy_id }}{% endif %}</a></dd>
+
+                    <dt>{% trans "Item coberto" %}</dt>
+                    <dd>
+                        <span class="pill">{{ claim.covered_item.kind_label }}</span>
+                        {% if claim.covered_item.description %} · {{ claim.covered_item.description }}{% endif %}
+                    </dd>
+
+                    <dt>{% trans "Cliente" %}</dt>
+                    <dd><a href="{% url 'clients:client_detail' claim.client_id %}">{{ claim.client.full_name }}</a></dd>
+
+                    <dt>{% trans "Status" %}</dt>
+                    <dd><span class="pill">{{ claim.get_status_display }}</span></dd>
+
+                    {% if claim.occurrence_date %}
+                    <dt>{% trans "Ocorrência" %}</dt>
+                    <dd>{{ claim.occurrence_date|date:"d/m/Y" }}</dd>
+                    {% endif %}
+
+                    {% if claim.amount %}
+                    <dt>{% trans "Valor" %}</dt>
+                    <dd>R$ {{ claim.amount|floatformat:2 }}</dd>
+                    {% endif %}
+
+                    <dt>{% trans "Cadastrado em" %}</dt>
+                    <dd>{{ claim.created_at|date:"d/m/Y H:i" }}</dd>
+
+                    <dt>{% trans "Atualizado em" %}</dt>
+                    <dd>{{ claim.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+
+                {% if claim.description %}
+                <hr style="border:0;border-top:1px solid var(--border);margin:1rem 0;">
+                <h3 style="margin:0 0 .4rem;font-size:.95rem;">{% trans "Descrição" %}</h3>
+                <p style="margin:0;color:var(--muted);white-space:pre-wrap;">{{ claim.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- AI summary placeholder (Sprint 23) --- #}
+        <div class="ai-block">
+            <div class="ai-card">
+                <div class="ai-head">
+                    <div class="ai-icon">✨</div>
+                    <h3>{% trans "Resumo com IA" %}</h3>
+                </div>
+                {% if claim.ai_summary %}
+                <p class="ai-text">{{ claim.ai_summary }}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        {% trans "Atualizar resumo" %}
+                    </button>
+                </div>
+                {% else %}
+                <p class="ai-text">{% trans "Gere um resumo automático deste sinistro com a IA, conectando apólice, item coberto e descrição." %}</p>
+                <div class="ai-actions">
+                    <button type="button" class="btn btn-primary btn-sm" disabled aria-disabled="true" title="{% trans "Disponível em breve" %}">
+                        ✨ {% trans "Resumir com IA" %}
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- Attachments placeholder (Sprint 14) --- #}
+        <div class="ai-block">
+            <div class="attach-card">
+                <h3>📎 {% trans "Anexos" %}</h3>
+                <p>{% trans "Anexos deste sinistro serão disponibilizados em breve." %}</p>
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Resumo rápido" %}</h2>
+            </div>
+            <div class="card-body">
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% trans "Sinistro vinculado à apólice e ao item coberto correspondente." %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

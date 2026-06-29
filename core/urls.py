@@ -38,4 +38,5 @@ urlpatterns = [
     path('', include('catalog.urls')),
     path('', include('proposals.urls')),
     path('', include('policies.urls')),
+    path('', include('claims.urls')),
 ]

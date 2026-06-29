@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'catalog',
     'proposals',
     'policies',
+    'claims',
 ]
 
 MIDDLEWARE = [
