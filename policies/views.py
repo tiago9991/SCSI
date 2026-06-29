@@ -74,6 +74,11 @@ class PolicyDetailView(TenantViewMixin, DetailView):
             self.object.covered_items.for_tenant(self.request.tenant).order_by('-id')
         )
         ctx['item_create_url'] = reverse_lazy('policies:covereditem_create', args=[self.object.pk])
+        # Attachments panel (Sprint 14).
+        from attachments.utils import attachments_context
+        att_ctx = attachments_context(self.object, self.request.tenant)
+        ctx['attachments'] = att_ctx['attachments']
+        ctx['upload_url'] = att_ctx['attachments_upload_url']
         return ctx
 
 

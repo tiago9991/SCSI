@@ -1,0 +1,49 @@
+{% load i18n %}
+<div class="ai-block">
+    <div class="card">
+        <div class="card-head">
+            <h2>📎 {% trans "Anexos" %}</h2>
+            <div class="card-head-right">
+                <a href="{{ upload_url }}" class="btn btn-primary btn-sm">+ {% trans "Enviar anexo" %}</a>
+            </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+            <div class="table-wrap">
+                <table class="data">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Nome" %}</th>
+                            <th>{% trans "Tamanho" %}</th>
+                            <th>{% trans "Enviado em" %}</th>
+                            <th class="text-right">{% trans "Ações" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for att in attachments %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'attachments:attachment_file' att.pk %}" target="_blank" rel="noopener" class="row-link">{{ att.name }}</a>
+                            </td>
+                            <td>{{ att.size|filesizeformat }}</td>
+                            <td>{{ att.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="text-right">
+                                <a href="{% url 'attachments:attachment_file' att.pk %}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" title="{% trans "Baixar / visualizar" %}">⬇</a>
+                                <form method="post" action="{% url 'attachments:attachment_delete' att.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-ghost btn-sm" title="{% trans "Excluir" %}" onclick="return confirm('{% trans "Excluir este anexo?" %}');">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="empty-row" style="padding:1.5rem 1rem;">
+                                {% trans "Nenhum anexo vinculado." %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

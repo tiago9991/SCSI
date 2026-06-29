@@ -1663,7 +1663,7 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 - [x] CRUD de propostas com cliente, seguradora, ramo, produtor.
 - [x] Itens cobertos 1:N na proposta.
 - [x] Status e validade.
-- [ ] Anexos (Sprint 14).
+- [x] Anexos (Sprint 14).
 
 ### Sprint 11 — Apólices
 
@@ -1683,14 +1683,14 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 - [x] Criar app `claims` com `Claim` (tenant).
 - [x] Sinistro vinculado a `Policy` + `PolicyCoveredItem`.
 - [x] CRUD com status e valor.
-- [ ] Anexos (Sprint 14).
+- [x] Anexos (Sprint 14).
 
 ### Sprint 14 — Anexos Privados
 
-- [ ] Criar app `attachments` com `Attachment` (tenant, GenericFK ou FKs).
-- [ ] Upload validado por tipo/tamanho.
-- [ ] `PrivateMediaView` para servir com validação de `brokerage` + permissão.
-- [ ] Aplicar anexos em clientes, propostas, apólices e sinistros.
+- [x] Criar app `attachments` com `Attachment` (tenant, GenericFK ou FKs).
+- [x] Upload validado por tipo/tamanho.
+- [x] `PrivateMediaView` para servir com validação de `brokerage` + permissão.
+- [x] Aplicar anexos em clientes, propostas, apólices e sinistros.
 
 ### Sprint 15 — CRM Grid
 

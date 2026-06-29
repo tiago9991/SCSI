@@ -82,6 +82,11 @@ class ProposalDetailView(TenantViewMixin, DetailView):
             'proposals:proposal_generate_policy', args=[self.object.pk]
         )
         ctx['can_generate_policy'] = self.object.status == Proposal.STATUS_ACCEPTED
+        # Attachments panel (Sprint 14).
+        from attachments.utils import attachments_context
+        att_ctx = attachments_context(self.object, self.request.tenant)
+        ctx['attachments'] = att_ctx['attachments']
+        ctx['upload_url'] = att_ctx['attachments_upload_url']
         return ctx
 
 

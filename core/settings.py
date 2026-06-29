@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'proposals',
     'policies',
     'claims',
+    'attachments',
 ]
 
 MIDDLEWARE = [
