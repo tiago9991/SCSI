@@ -5,6 +5,7 @@ from crm.views import (
     DealCreateView,
     DealDeleteView,
     DealDetailView,
+    DealKanbanView,
     DealListView,
     DealUpdateView,
     PipelineCreateView,
@@ -15,6 +16,7 @@ from crm.views import (
     PipelineStageCreateView,
     PipelineStageDeleteView,
     PipelineStageUpdateView,
+    deal_move,
 )
 
 
@@ -35,8 +37,10 @@ urlpatterns = [
 
     # --- Deals (CRM Grid) ---
     path('crm/negociacoes/', DealListView.as_view(), name='deal_list'),
+    path('crm/negociacoes/kanban/', DealKanbanView.as_view(), name='deal_kanban'),
     path('crm/negociacoes/novo/', DealCreateView.as_view(), name='deal_create'),
     path('crm/negociacoes/<int:pk>/', DealDetailView.as_view(), name='deal_detail'),
     path('crm/negociacoes/<int:pk>/editar/', DealUpdateView.as_view(), name='deal_update'),
     path('crm/negociacoes/<int:pk>/excluir/', DealDeleteView.as_view(), name='deal_delete'),
+    path('crm/negociacoes/<int:pk>/mover/', deal_move, name='deal_move'),
 ]

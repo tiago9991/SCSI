@@ -1,0 +1,256 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Arraste os cards entre as etapas do pipeline." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'crm:pipeline_list' %}">CRM</a>
+<span class="current">{% trans "Kanban" %}</span>
+{% endblock %}
+
+{% block page_actions %}
+<form method="get" class="kanban-pipeline-select">
+    <select name="pipeline" class="select" onchange="this.form.submit()" title="{% trans "Pipeline" %}">
+        {% for p in pipelines %}
+        <option value="{{ p.pk }}" {% if pipeline and p.pk == pipeline.pk %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+    </select>
+</form>
+<a href="{{ list_url }}" class="btn btn-outline btn-sm" title="{% trans "Visualização em grade" %}">☰ {% trans "Grade" %}</a>
+<a href="{{ pipeline_list_url }}" class="btn btn-outline btn-sm">⚙ {% trans "Pipelines" %}</a>
+{% if create_url %}<a href="{{ create_url }}" class="btn btn-primary btn-sm">+ {% trans "Nova" %}</a>{% endif %}
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .kanban-board {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding-bottom: .5rem;
+        align-items: flex-start;
+    }
+    .kanban-pipeline-select .select {
+        padding: .4rem .6rem; font-size: .82rem;
+        border: 1px solid var(--border); border-radius: 8px;
+        background: var(--surface); color: var(--ink);
+        cursor: pointer;
+    }
+    .kanban-column {
+        flex: 0 0 300px;
+        min-width: 300px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        display: flex; flex-direction: column;
+        max-height: calc(100vh - 220px);
+    }
+    .kanban-column-head {
+        display: flex; align-items: center; gap: .5rem;
+        padding: .75rem 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .kanban-column-head .dot {
+        width: 12px; height: 12px; border-radius: 50%;
+        flex-shrink: 0;
+    }
+    .kanban-column-head .name { margin: 0; font-size: .9rem; font-weight: 700; flex: 1; word-break: break-word; }
+    .kanban-column-head .count {
+        font-size: .72rem; font-weight: 600; color: var(--muted);
+        background: var(--canvas); border-radius: 999px; padding: .1rem .5rem;
+    }
+    .kanban-column-body {
+        padding: .65rem;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 80px;
+        transition: background .15s;
+    }
+    .kanban-column-body.drag-over { background: var(--primary-soft); border: 1px dashed var(--primary); }
+    .kanban-card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-left: 3px solid var(--stage-color, var(--primary));
+        border-radius: 8px; padding: .65rem .8rem;
+        margin-bottom: .55rem; cursor: grab;
+        box-shadow: var(--shadow-sm);
+    }
+    .kanban-card:hover { border-color: var(--primary); }
+    .kanban-card.dragging { opacity: .45; }
+    .kanban-card .card-title { font-size: .88rem; font-weight: 600; color: var(--ink); margin: 0 0 .35rem; word-break: break-word; }
+    .kanban-card .card-title a { color: inherit; }
+    .kanban-card .card-title a:hover { color: var(--primary); text-decoration: none; }
+    .kanban-card .card-meta { font-size: .76rem; color: var(--muted); display: flex; flex-direction: column; gap: .15rem; }
+    .kanban-card .card-amount { font-size: .82rem; font-weight: 700; color: var(--ink); }
+    .kanban-column-footer {
+        padding: .5rem .65rem;
+        text-align: right;
+        font-size: .72rem;
+        color: var(--muted);
+        border-top: 1px solid var(--border);
+    }
+    .kanban-empty { text-align: center; color: var(--muted-soft); font-size: .8rem; padding: 1.25rem .5rem; }
+    .kanban-toast {
+        position: fixed; bottom: 1.25rem; right: 1.25rem; z-index: 50;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 8px; box-shadow: var(--shadow);
+        padding: .6rem .9rem; font-size: .85rem; color: var(--ink);
+        opacity: 0; transform: translateY(10px); transition: opacity .2s, transform .2s;
+        pointer-events: none;
+    }
+    .kanban-toast.show { opacity: 1; transform: translateY(0); }
+    .kanban-toast.error { border-color: var(--danger); color: var(--danger); }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if not pipeline %}
+<div class="card">
+    <div class="empty-state">
+        <div class="illustration">🧭</div>
+        <h3>{% trans "Nenhum pipeline cadastrado" %}</h3>
+        <p>{% trans "Crie um pipeline e suas etapas para visualizar o Kanban." %}</p>
+        <a href="{% url 'crm:pipeline_create' %}" class="btn btn-primary">+ {% trans "Novo pipeline" %}</a>
+    </div>
+</div>
+{% elif not stages %}
+<div class="card">
+    <div class="empty-state">
+        <div class="illustration">📋</div>
+        <h3>{% trans "Pipeline sem etapas" %}</h3>
+        <p>{% trans "Adicione etapas ao pipeline para montar o Kanban." %}</p>
+        <a href="{% url 'crm:stage_create' %}?pipeline={{ pipeline.pk }}" class="btn btn-primary">+ {% trans "Nova etapa" %}</a>
+    </div>
+</div>
+{% else %}
+<div class="kanban-board" id="kanban" data-move-url="{{ deal_move_url }}"
+     {% if pipeline %}data-move-pipeline="{{ pipeline.pk }}"{% endif %}>
+    {% for stage, stage_deals in stages_with_deals %}
+    <section class="kanban-column" data-stage="{{ stage.pk }}">
+        <header class="kanban-column-head">
+            <span class="dot" style="background:{{ stage.color }}"></span>
+            <h3 class="name">{{ stage.name }}</h3>
+            <span class="count">{{ stage_deals|length }}</span>
+        </header>
+        <div class="kanban-column-body" data-dropzone="{{ stage.pk }}">
+            {% for deal in stage_deals %}
+            <article class="kanban-card" draggable="true" data-deal="{{ deal.pk }}" style="--stage-color:{{ stage.color }}">
+                <div class="card-title">
+                    <a href="{% url 'crm:deal_detail' deal.pk %}">{{ deal.title }}</a>
+                </div>
+                <div class="card-meta">
+                    <span><a href="{% url 'clients:client_detail' deal.client_id %}">{{ deal.client.full_name }}</a></span>
+                    {% if deal.amount %}<span class="card-amount">R$ {{ deal.amount|floatformat:2 }}</span>{% endif %}
+                    {% if deal.expected_close_date %}<span>📅 {{ deal.expected_close_date|date:"d/m/Y" }}</span>{% endif %}
+                    <span class="pill" style="background:var(--canvas);color:var(--muted);">{{ deal.get_status_display }}</span>
+                </div>
+            </article>
+            {% empty %}
+            <div class="kanban-empty">{% trans "Arraste cards para cá" %}</div>
+            {% endfor %}
+        </div>
+        {% with total=stage.total %}
+        <footer class="kanban-column-footer">
+            {% if total %}{% trans "Total" %}: R$ {{ total|floatformat:2 }}{% else %}—{% endif %}
+        </footer>
+        {% endwith %}
+    </section>
+    {% endfor %}
+</div>
+<div class="kanban-toast" id="kanban-toast"></div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const board = document.getElementById('kanban');
+    const csrfToken = '{{ csrf_token }}';
+    const toast = document.getElementById('kanban-toast');
+    let timer = null;
+    // Base move URL carries a placeholder pk (0); swapped client-side.
+    const moveUrlBase = board ? board.dataset.moveUrl : '';
+
+    function showToast(msg, isError) {
+        toast.textContent = msg;
+        toast.classList.toggle('error', !!isError);
+        toast.classList.add('show');
+        clearTimeout(timer);
+        timer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function moveUrlFor(pk) {
+        return moveUrlBase.replace('/0/', '/' + pk + '/');
+    }
+
+    const cards = document.querySelectorAll('.kanban-card');
+    const dropzones = document.querySelectorAll('.kanban-column-body');
+
+    cards.forEach(card => {
+        card.addEventListener('dragstart', e => {
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', card.dataset.deal);
+        });
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    });
+
+    dropzones.forEach(zone => {
+        zone.addEventListener('dragover', e => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', e => {
+            if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const dealPk = e.dataTransfer.getData('text/plain');
+            const card = document.querySelector('.kanban-card[data-deal="' + dealPk + '"]');
+            const fromColumn = card ? card.closest('.kanban-column') : null;
+            const toColumn = zone.closest('.kanban-column');
+            const targetStage = toColumn ? toColumn.dataset.stage : null;
+            if (!dealPk || !targetStage) return;
+
+            const params = new URLSearchParams();
+            params.append('stage', targetStage);
+
+            fetch(moveUrlFor(dealPk), {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                body: params,
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    if (card) zone.appendChild(card);
+                    if (fromColumn) updateCount(fromColumn);
+                    updateCount(toColumn);
+                    showToast('Negociação movida para a etapa.');
+                } else {
+                    showToast(data.error || 'Erro ao mover.', true);
+                }
+            }).catch(() => showToast('Falha de rede ao mover.', true));
+        });
+    });
+
+    function updateCount(column) {
+        const body = column.querySelector('.kanban-column-body');
+        const count = body.querySelectorAll('.kanban-card').length;
+        const badge = column.querySelector('.kanban-column-head .count');
+        if (badge) badge.textContent = count;
+        const empty = body.querySelector('.kanban-empty');
+        if (count === 0 && !empty) {
+            const div = document.createElement('div');
+            div.className = 'kanban-empty';
+            div.textContent = 'Arraste cards para cá';
+            body.appendChild(div);
+        } else if (count > 0 && empty) {
+            empty.remove();
+        }
+    }
+})();
+</script>
+{% endblock %}

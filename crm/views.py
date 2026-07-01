@@ -6,17 +6,21 @@ to ``request.tenant`` — data of another brokerage is never reachable.
 
 Sprint 15 implements the CRM Grid (PRD §19.2 "grid"): a paginated, filterable
 and sortable list of ``Deal`` objects, plus the CRUD for ``Pipeline``,
-``PipelineStage`` and ``Deal``. The Kanban view, drag-and-drop and stage
-persistência land in Sprint 16.
+``PipelineStage`` and ``Deal``.
+
+Sprint 16 adds the CRM Kanban (PRD §19.2 "kanban"): columns per stage,
+drag-and-drop cards and a POST endpoint to persist the stage change.
 """
-from django.db.models import Q
+from django.db.models import Q, Sum
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from base.views import TenantViewMixin
+from base.views import TenantRequiredMixin, TenantViewMixin
 from crm.forms import DealForm, PipelineForm, PipelineStageForm
 from crm.models import Deal, Pipeline, PipelineStage
 
@@ -341,3 +345,97 @@ class DealDeleteView(TenantViewMixin, DeleteView):
         ctx['list_url'] = reverse_lazy('crm:deal_list')
         ctx['detail_url'] = reverse_lazy('crm:deal_detail', args=[self.object.pk])
         return ctx
+
+
+# ---------------------------------------------------------------------------
+# Deal (CRM Kanban) — Sprint 16
+# ---------------------------------------------------------------------------
+class DealKanbanView(TenantRequiredMixin, ListView):
+    """CRM Kanban board (PRD §19.2 "kanban" / Sprint 16).
+
+    Stage columns of the selected (or default) pipeline are rendered side by
+    side with deal cards the user can drag-and-drop between stages. The board
+    is read through ``PipelineStage.for_tenant`` so a brokerage never sees
+    another brokerage's stages, and every card comes from a tenant-scoped
+    ``Deal`` queryset.
+
+    Optional query parameters:
+
+    - ``pipeline``: pipeline pk. Defaults to the brokerage default pipeline,
+      or the first pipeline of the brokerage when none is flagged as default.
+    """
+
+    model = Deal
+    template_name = 'crm/deal_kanban.html'
+    context_object_name = 'deals'
+
+    def get_pipeline(self):
+        tenant = self.request.tenant
+        pipelines = Pipeline.objects.for_tenant(tenant).order_by('-is_default', 'id')
+        pipeline_pk = self.request.GET.get('pipeline')
+        if pipeline_pk:
+            return get_object_or_404(pipelines, pk=pipeline_pk)
+        return pipelines.first()
+
+    def get_queryset(self):
+        tenant = self.request.tenant
+        qs = Deal.objects.for_tenant(tenant).select_related('client', 'stage', 'stage__pipeline')
+        pipeline = self.get_pipeline()
+        if pipeline is not None:
+            qs = qs.filter(stage__pipeline=pipeline)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        tenant = self.request.tenant
+        pipeline = self.get_pipeline()
+
+        stages = []
+        if pipeline is not None:
+            stages = list(
+                PipelineStage.objects.for_tenant(tenant)
+                .filter(pipeline=pipeline)
+                .order_by('order', 'id')
+                .annotate(total=Sum('deals__amount'))
+            )
+
+        # Group deals by stage so the template can render columns directly.
+        deals_by_stage = {stage.pk: [] for stage in stages}
+        for deal in ctx['deals']:
+            stage_id = deal.stage_id
+            if stage_id in deals_by_stage:
+                deals_by_stage[stage_id].append(deal)
+
+        stages_with_deals = [(stage, deals_by_stage[stage.pk]) for stage in stages]
+
+        ctx['pipeline'] = pipeline
+        ctx['pipelines'] = Pipeline.objects.for_tenant(tenant).order_by('-is_default', 'id')
+        ctx['stages'] = stages
+        ctx['stages_with_deals'] = stages_with_deals
+        ctx['page_title'] = _('CRM · Kanban')
+        ctx['list_url'] = reverse_lazy('crm:deal_list')
+        ctx['kanban_url'] = reverse_lazy('crm:deal_kanban')
+        ctx['create_url'] = reverse_lazy('crm:deal_create')
+        ctx['pipeline_list_url'] = reverse_lazy('crm:pipeline_list')
+        ctx['deal_move_url'] = reverse_lazy('crm:deal_move', args=[0])
+        return ctx
+
+
+@require_POST
+def deal_move(request, pk):
+    """Persist a drag-and-drop stage change for a deal (Sprint 16).
+
+    Body: ``stage`` (PipelineStage pk) and optional ``order`` (int). The deal
+    and the target stage are both fetched through the tenant-scoped queryset so
+    a cross-brokerage move is impossible by construction.
+    """
+    if not request.user.is_authenticated or getattr(request, 'tenant', None) is None:
+        return JsonResponse({'ok': False, 'error': 'Não autorizado.'}, status=403)
+
+    tenant = request.tenant
+    deal = get_object_or_404(Deal.objects.for_tenant(tenant), pk=pk)
+    stage_pk = request.POST.get('stage')
+    target_stage = get_object_or_404(PipelineStage.objects.for_tenant(tenant), pk=stage_pk)
+    deal.stage = target_stage
+    deal.save(update_fields=['stage', 'updated_at'])
+    return JsonResponse({'ok': True, 'stage': target_stage.pk})

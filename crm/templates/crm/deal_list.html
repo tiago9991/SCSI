@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block page_actions %}
+<a href="{% url 'crm:deal_kanban' %}" class="btn btn-outline btn-sm" title="{% trans "Visualização Kanban" %}">▦ {% trans "Kanban" %}</a>
 <a href="{{ pipeline_list_url }}" class="btn btn-outline btn-sm">⚙ {% trans "Pipelines" %}</a>
 {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova negociação" %}</a>{% endif %}
 {% endblock %}

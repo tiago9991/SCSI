@@ -1700,11 +1700,11 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 16 — CRM Kanban
 
-- [ ] Tela Kanban com colunas por etapa.
-- [ ] Cards arrastáveis (drag-and-drop).
-- [ ] Cores personalizáveis por etapa.
-- [ ] Nomes de etapas personalizáveis.
-- [ ] Persistir mudança de etapa ao arrastar.
+- [x] Tela Kanban com colunas por etapa.
+- [x] Cards arrastáveis (drag-and-drop).
+- [x] Cores personalizáveis por etapa.
+- [x] Nomes de etapas personalizáveis.
+- [x] Persistir mudança de etapa ao arrastar.
 
 ### Sprint 17 — Renovações
 
