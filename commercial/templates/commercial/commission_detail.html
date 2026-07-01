@@ -1,0 +1,60 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes da comissão" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'commercial:commission_list' %}">Comissões</a>
+<span class="current">{% trans "Comissão" %} #{{ commission.pk }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head"><h2>{% trans "Dados da comissão" %}</h2></div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Valor total" %}</dt><dd>R$ {{ commission.amount|floatformat:2 }}</dd>
+                    <dt>{% trans "Apólice" %}</dt>
+                    <dd>{% if commission.policy_id %}<a href="{% url 'policies:policy_detail' commission.policy_id %}">{{ commission.policy.number|default:"—" }}</a>{% else %}—{% endif %}</dd>
+                    <dt>{% trans "Proposta" %}</dt>
+                    <dd>{% if commission.proposal_id %}<a href="{% url 'proposals:proposal_detail' commission.proposal_id %}">#{{ commission.proposal_id }}</a>{% else %}—{% endif %}</dd>
+                    <dt>{% trans "Agente" %}</dt>
+                    <dd>{% if commission.agent_id %}<a href="{% url 'commercial:agent_detail' commission.agent_id %}">{{ commission.agent.name }}</a>{% else %}—{% endif %}</dd>
+                    <dt>{% trans "Produtor" %}</dt>
+                    <dd>{% if commission.producer_id %}<a href="{% url 'commercial:producer_detail' commission.producer_id %}">{{ commission.producer.name }}</a>{% else %}—{% endif %}</dd>
+                    <dt>{% trans "Data de referência" %}</dt><dd>{{ commission.reference_date|date:"d/m/Y"|default:"—" }}</dd>
+                </dl>
+
+                <hr style="border:0;border-top:1px solid var(--border);margin:1rem 0;">
+                <h3 style="margin:0 0 .5rem;font-size:.95rem;">{% trans "Repasses" %}</h3>
+                <dl class="kv">
+                    <dt>{% trans "Corretora" %}</dt><dd>R$ {{ commission.brokerage_share|floatformat:2 }}</dd>
+                    <dt>{% trans "Agente" %}</dt><dd>R$ {{ commission.agent_share|floatformat:2 }}</dd>
+                    <dt>{% trans "Produtor" %}</dt><dd>R$ {{ commission.producer_share|floatformat:2 }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head"><h2>{% trans "Resumo rápido" %}</h2></div>
+            <div class="card-body">
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% trans "Repasses calculados a partir dos percentuais configurados no agente e no produtor." %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

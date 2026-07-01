@@ -1,0 +1,58 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Formulário de comissão" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'commercial:commission_list' %}">Comissões</a>
+<span class="current">{{ page_title }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-head"><h2>{{ page_title }}</h2></div>
+    <div class="card-body">
+        <form method="post" class="form-grid" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="field" style="grid-column:1/-1;"><ul class="errorlist">{{ form.non_field_errors }}</ul></div>{% endif %}
+            <div class="field">
+                <label for="{{ form.amount.id_for_label }}">{{ form.amount.label }} <span class="req">*</span></label>
+                {{ form.amount }}{{ form.amount.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.reference_date.id_for_label }}">{{ form.reference_date.label }}</label>
+                {{ form.reference_date }}{{ form.reference_date.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.policy.id_for_label }}">{{ form.policy.label }}</label>
+                {{ form.policy }}{{ form.policy.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.proposal.id_for_label }}">{{ form.proposal.label }}</label>
+                {{ form.proposal }}{{ form.proposal.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.agent.id_for_label }}">{{ form.agent.label }}</label>
+                {{ form.agent }}{{ form.agent.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.producer.id_for_label }}">{{ form.producer.label }}</label>
+                {{ form.producer }}{{ form.producer.errors }}
+            </div>
+            <div class="field" style="grid-column:1/-1;color:var(--muted);font-size:.82rem;">
+                {% trans "Os repasses (corretora / agente / produtor) são calculados automaticamente a partir dos percentuais configurados." %}
+            </div>
+            <div class="form-actions" style="grid-column:1/-1;">
+                <a href="{{ list_url }}" class="btn btn-outline">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-primary">{{ submit_label|default:"Salvar" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

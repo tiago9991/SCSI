@@ -1,0 +1,50 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Endosso" %}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}
+{% if policy %}{% blocktrans with number=policy.number|default:"--" %}Apólice {{ number }}{% endblocktrans %}{% else %}{% trans "Formulário de endosso" %}{% endif %}
+{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'policies:policy_list' %}">Apólices</a>
+{% if policy %}<a href="{% url 'policies:policy_detail' policy.pk %}">{% if policy.number %}{{ policy.number }}{% else %}#{% endif %}{{ policy.pk }}</a>{% endif %}
+<span class="current">{% trans "Endosso" %}</span>
+{% endblock %}
+
+{% block page_actions %}
+{% if policy %}<a href="{% url 'policies:policy_detail' policy.pk %}" class="btn btn-outline btn-sm">← {% trans "Voltar à apólice" %}</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-head"><h2>{{ page_title }}</h2></div>
+    <div class="card-body">
+        <form method="post" class="form-grid" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="field" style="grid-column:1/-1;"><ul class="errorlist">{{ form.non_field_errors }}</ul></div>{% endif %}
+            <div class="field">
+                <label for="{{ form.number.id_for_label }}">{{ form.number.label }}</label>
+                {{ form.number }}{{ form.number.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.type.id_for_label }}">{{ form.type.label }}</label>
+                {{ form.type }}{{ form.type.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.effective_date.id_for_label }}">{{ form.effective_date.label }}</label>
+                {{ form.effective_date }}{{ form.effective_date.errors }}
+            </div>
+            <div class="field" style="grid-column:1/-1;">
+                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                {{ form.description }}{{ form.description.errors }}
+            </div>
+            <div class="form-actions" style="grid-column:1/-1;">
+                <a href="{{ list_url|default:'/' }}" class="btn btn-outline">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-primary">{{ submit_label|default:"Salvar" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

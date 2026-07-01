@@ -1,0 +1,69 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes da renovação" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'policies:renewal_list' %}">Renovações</a>
+<span class="current">{% trans "Renovação" %} #{{ renewal.pk }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Dados da renovação" %}</h2>
+            </div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Apólice" %}</dt>
+                    <dd><a href="{% url 'policies:policy_detail' renewal.policy_id %}">{% if renewal.policy.number %}{{ renewal.policy.number }}{% else %}#{{ renewal.policy_id }}{% endif %}</a></dd>
+
+                    <dt>{% trans "Cliente" %}</dt>
+                    <dd><a href="{% url 'clients:client_detail' renewal.policy.client_id %}">{{ renewal.policy.client.full_name }}</a></dd>
+
+                    <dt>{% trans "Vencimento" %}</dt>
+                    <dd>{{ renewal.due_date|date:"d/m/Y"|default:"—" }}</dd>
+
+                    <dt>{% trans "Status" %}</dt>
+                    <dd><span class="pill">{{ renewal.get_status_display }}</span></dd>
+
+                    <dt>{% trans "Cadastrado em" %}</dt>
+                    <dd>{{ renewal.created_at|date:"d/m/Y H:i" }}</dd>
+
+                    <dt>{% trans "Atualizado em" %}</dt>
+                    <dd>{{ renewal.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+
+                {% if renewal.notes %}
+                <hr style="border:0;border-top:1px solid var(--border);margin:1rem 0;">
+                <h3 style="margin:0 0 .4rem;font-size:.95rem;">{% trans "Observações" %}</h3>
+                <p style="margin:0;color:var(--muted);white-space:pre-wrap;">{{ renewal.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head">
+                <h2>{% trans "Resumo rápido" %}</h2>
+            </div>
+            <div class="card-body">
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% trans "Acompanhe o vencimento desta apólice e mantenha o status atualizado." %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

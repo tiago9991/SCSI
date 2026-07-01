@@ -1708,29 +1708,29 @@ CSRF_TRUSTED_ORIGINS=https://scsi.digital,https://*.scsi.digital
 
 ### Sprint 17 — Renovações
 
-- [ ] Criar `Renewal` em `policies`.
-- [ ] Controle de vencimentos e status.
-- [ ] Alertas de renovações próximas (30/60/90 dias).
+- [x] Criar `Renewal` em `policies`.
+- [x] Controle de vencimentos e status.
+- [x] Alertas de renovações próximas (30/60/90 dias).
 - [ ] Relatórios relacionados (Sprint 21).
 
 ### Sprint 18 — Endossos
 
-- [ ] Criar `Endorsement` em `policies`.
-- [ ] CRUD de endossos relacionados a apólices.
-- [ ] Tipo, descrição e data de eficácia.
+- [x] Criar `Endorsement` em `policies`.
+- [x] CRUD de endossos relacionados a apólices.
+- [x] Tipo, descrição e data de eficácia.
 
 ### Sprint 19 — Agentes e Produtores
 
-- [ ] Criar app `commercial` com `Agent`, `Producer`.
-- [ ] Um agente pode ter vários produtores.
-- [ ] Produtor pode ser direto da corretora (sem agente).
-- [ ] CRUDs completos.
+- [x] Criar app `commercial` com `Agent`, `Producer`.
+- [x] Um agente pode ter vários produtores.
+- [x] Produtor pode ser direto da corretora (sem agente).
+- [x] CRUDs completos.
 
 ### Sprint 20 — Comissões
 
-- [ ] Criar `Commission` com `amount`, `brokerage_share`, `agent_share`, `producer_share`.
-- [ ] Cálculo automatizado de repasses a partir de percentuais.
-- [ ] Tela de comissões por período/agente/produtor.
+- [x] Criar `Commission` com `amount`, `brokerage_share`, `agent_share`, `producer_share`.
+- [x] Cálculo automatizado de repasses a partir de percentuais.
+- [x] Tela de comissões por período/agente/produtor.
 - [ ] Relatórios de comissões (Sprint 21).
 
 ### Sprint 21 — Relatórios

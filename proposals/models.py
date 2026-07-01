@@ -7,11 +7,10 @@ from base.models import BaseCoveredItem, BaseTenantModel
 class Proposal(BaseTenantModel):
     """Tenanted insurance proposal.
 
-    Per PRD §16.5: holds client, insurer, branch and premium metadata; covered
-    items (the Sprint 9 focus) attach 1:N via ``ProposalCoveredItem``. The
-    ``producer`` FK to ``commercial.Producer`` is added in Sprint 19 (commercial
-    app) — it is nullable per spec, so it is omitted until the related app is
-    created.
+    Per PRD §16.5: holds client, insurer, branch, producer and premium
+    metadata; covered items (the Sprint 9 focus) attach 1:N via
+    ``ProposalCoveredItem``. The ``producer`` FK to ``commercial.Producer`` is
+    nullable per spec.
 
     Status flow (PRD §20.1): rascunho → enviada → (aceita | recusada) → expirada.
     The "Gerar apólice" action (Sprint 12) requires ``status=aceita``.
@@ -49,7 +48,14 @@ class Proposal(BaseTenantModel):
         related_name='proposals',
         verbose_name=_('ramo'),
     )
-    # ``producer`` FK (commercial.Producer, nullable) is added in Sprint 19.
+    producer = models.ForeignKey(
+        'commercial.Producer',
+        on_delete=models.SET_NULL,
+        related_name='proposals',
+        verbose_name=_('produtor'),
+        null=True,
+        blank=True,
+    )
     status = models.CharField(
         _('status'),
         max_length=32,

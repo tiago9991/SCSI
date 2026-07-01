@@ -10,10 +10,10 @@ from proposals.models import Proposal, ProposalCoveredItem
 class ProposalForm(forms.ModelForm):
     """ModelForm for creating/updating a tenanted ``Proposal``.
 
-    FK choices (client, insurance_company, branch) are scoped to the current
-    tenant from the view via ``TenantFormMixin.restrict_form_choices``. The
-    ``producer`` FK (commercial.Producer, nullable per PRD §16.5) is added in
-    Sprint 19 once the ``commercial`` app exists.
+    FK choices (client, insurance_company, branch, producer) are scoped to the
+    current tenant from the view via ``TenantFormMixin.restrict_form_choices``.
+    The ``producer`` FK (commercial.Producer, nullable per PRD §16.5) is
+    optional.
     """
 
     class Meta:
@@ -22,6 +22,7 @@ class ProposalForm(forms.ModelForm):
             'client',
             'insurance_company',
             'branch',
+            'producer',
             'status',
             'valid_until',
             'premium',
@@ -31,6 +32,7 @@ class ProposalForm(forms.ModelForm):
             'client': forms.Select(attrs={'class': 'select'}),
             'insurance_company': forms.Select(attrs={'class': 'select'}),
             'branch': forms.Select(attrs={'class': 'select'}),
+            'producer': forms.Select(attrs={'class': 'select'}),
             'status': forms.Select(attrs={'class': 'select'}),
             'valid_until': forms.DateInput(attrs={'type': 'date', 'autocomplete': 'off'}),
             'premium': forms.NumberInput(attrs={'step': '0.01', 'placeholder': '0,00'}),
@@ -41,6 +43,7 @@ class ProposalForm(forms.ModelForm):
             'client': _('Cliente'),
             'insurance_company': _('Seguradora'),
             'branch': _('Ramo'),
+            'producer': _('Produtor'),
             'status': _('Status'),
             'valid_until': _('Válido até'),
             'premium': _('Prêmio'),

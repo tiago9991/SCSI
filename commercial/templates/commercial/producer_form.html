@@ -1,0 +1,53 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Formulário de produtor" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'commercial:producer_list' %}">Produtores</a>
+<span class="current">{{ page_title }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-head"><h2>{{ page_title }}</h2></div>
+    <div class="card-body">
+        <form method="post" class="form-grid" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="field" style="grid-column:1/-1;"><ul class="errorlist">{{ form.non_field_errors }}</ul></div>{% endif %}
+            <div class="field" style="grid-column:1/-1;">
+                <label for="{{ form.name.id_for_label }}">{{ form.name.label }} <span class="req">*</span></label>
+                {{ form.name }}{{ form.name.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.agent.id_for_label }}">{{ form.agent.label }}</label>
+                {{ form.agent }}{{ form.agent.errors }}
+                {% if form.agent.help_text %}<div class="helptext">{{ form.agent.help_text }}</div>{% endif %}
+            </div>
+            <div class="field">
+                <label for="{{ form.document.id_for_label }}">{{ form.document.label }}</label>
+                {{ form.document }}{{ form.document.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.commission_percent.id_for_label }}">{{ form.commission_percent.label }}</label>
+                {{ form.commission_percent }}{{ form.commission_percent.errors }}
+                {% if form.commission_percent.help_text %}<div class="helptext">{{ form.commission_percent.help_text }}</div>{% endif %}
+            </div>
+            <div class="field">
+                <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
+                {{ form.contact }}{{ form.contact.errors }}
+            </div>
+            <div class="form-actions" style="grid-column:1/-1;">
+                <a href="{{ list_url }}" class="btn btn-outline">{% trans "Cancelar" %}</a>
+                <button type="submit" class="btn btn-primary">{{ submit_label|default:"Salvar" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

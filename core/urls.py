@@ -41,4 +41,5 @@ urlpatterns = [
     path('', include('claims.urls')),
     path('', include('attachments.urls')),
     path('', include('crm.urls')),
+    path('', include('commercial.urls')),
 ]

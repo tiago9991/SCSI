@@ -120,3 +120,113 @@ class PolicyCoveredItem(BaseCoveredItem):
 
     def __str__(self):
         return f'{self.kind_label} · {self.description or f"#{self.pk}"}'
+
+
+class Endorsement(BaseTenantModel):
+    """Tenanted endorsement bound to a policy (PRD §16.6 / §9.11 / Sprint 18).
+
+    An endorsement (endosso) is an alteration to an existing ``Policy``: типа
+    (type), descrição e data de eficácia. Endossos are always scoped to the
+    brokerage of the parent policy via ``BaseTenantModel``.
+    """
+
+    TYPE_CHANGE = 'alteracao'
+    TYPE_INCLUSION = 'inclusao'
+    TYPE_EXCLUSION = 'exclusao'
+    TYPE_CANCELLATION = 'cancelamento'
+    TYPE_OTHER = 'outros'
+
+    TYPE_CHOICES = [
+        (TYPE_CHANGE, _('Alteração')),
+        (TYPE_INCLUSION, _('Inclusão')),
+        (TYPE_EXCLUSION, _('Exclusão')),
+        (TYPE_CANCELLATION, _('Cancelamento')),
+        (TYPE_OTHER, _('Outros')),
+    ]
+
+    policy = models.ForeignKey(
+        Policy,
+        on_delete=models.CASCADE,
+        related_name='endorsements',
+        verbose_name=_('apólice'),
+    )
+    number = models.CharField(
+        _('número'),
+        max_length=64,
+        blank=True,
+        help_text=_('Número do endosso definido pela seguradora.'),
+    )
+    type = models.CharField(
+        _('tipo'),
+        max_length=32,
+        choices=TYPE_CHOICES,
+        default=TYPE_CHANGE,
+    )
+    description = models.TextField(_('descrição'), blank=True)
+    effective_date = models.DateField(_('data de eficácia'), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('endosso')
+        verbose_name_plural = _('endossos')
+        ordering = ('-id',)
+        indexes = [
+            models.Index(fields=('brokerage', 'id')),
+            models.Index(fields=('brokerage', 'policy', 'id')),
+            models.Index(fields=('brokerage', 'effective_date')),
+        ]
+
+    def __str__(self):
+        return f'{self.number or f"#{self.pk}"} · {self.get_type_display()}'
+
+
+class Renewal(BaseTenantModel):
+    """Tenanted policy renewal (PRD §16.6 / §8.8 / §9.10 / Sprint 17).
+
+    Tracks the renewal lifecycle of an existing ``Policy``: due date
+    (``due_date``) and status. Alertas de renovações próximas (30/60/90 dias)
+    are computed from ``due_date`` and surfaced in the renewal list (and later
+    in the dashboard, Sprint 22).
+    """
+
+    STATUS_PENDING = 'pendente'
+    STATUS_IN_PROGRESS = 'em_andamento'
+    STATUS_RENEWED = 'renovada'
+    STATUS_EXPIRED = 'vencida'
+    STATUS_CANCELED = 'cancelada'
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, _('Pendente')),
+        (STATUS_IN_PROGRESS, _('Em andamento')),
+        (STATUS_RENEWED, _('Renovada')),
+        (STATUS_EXPIRED, _('Vencida')),
+        (STATUS_CANCELED, _('Cancelada')),
+    ]
+
+    policy = models.ForeignKey(
+        Policy,
+        on_delete=models.CASCADE,
+        related_name='renewals',
+        verbose_name=_('apólice'),
+    )
+    due_date = models.DateField(_('vencimento'), null=True, blank=True)
+    status = models.CharField(
+        _('status'),
+        max_length=32,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+    )
+    notes = models.TextField(_('observações'), blank=True)
+
+    class Meta:
+        verbose_name = _('renovação')
+        verbose_name_plural = _('renovações')
+        ordering = ('due_date', '-id')
+        indexes = [
+            models.Index(fields=('brokerage', 'id')),
+            models.Index(fields=('brokerage', 'status')),
+            models.Index(fields=('brokerage', 'due_date')),
+            models.Index(fields=('brokerage', 'policy', 'id')),
+        ]
+
+    def __str__(self):
+        return f'{self.policy} · {self.due_date or f"#{self.pk}"}'

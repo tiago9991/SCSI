@@ -1,0 +1,24 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Confirme a exclusão do produtor." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'commercial:producer_list' %}">Produtores</a>
+<span class="current">{% trans "Excluir" %}</span>
+{% endblock %}
+
+{% block content %}
+<div class="danger-card">
+    <p>{% blocktrans %}Tem certeza de que deseja excluir o produtor <strong>{{ object }}</strong>? Esta ação não pode ser desfeita.{% endblocktrans %}</p>
+</div>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+        <a href="{% url 'commercial:producer_detail' object.pk %}" class="btn btn-outline">{% trans "Cancelar" %}</a>
+        <button type="submit" class="btn btn-danger">🗑 {% trans "Excluir definitivamente" %}</button>
+    </div>
+</form>
+{% endblock %}

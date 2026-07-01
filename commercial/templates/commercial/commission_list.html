@@ -1,0 +1,138 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Comissões e repasses por agente e produtor." %}{% endblock %}
+
+{% block breadcrumb %}
+<span class="current">Comissões</span>
+{% endblock %}
+
+{% block page_actions %}
+{% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova comissão" %}</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <div class="card" style="flex:1;min-width:160px;margin:0;">
+        <div class="card-body" style="padding:.9rem 1rem;">
+            <div class="fs-12 text-muted" style="font-size:.78rem;color:var(--muted);">{% trans "Total" %}</div>
+            <div style="font-size:1.2rem;font-weight:700;">R$ {{ total_amount|floatformat:2 }}</div>
+        </div>
+    </div>
+    <div class="card" style="flex:1;min-width:160px;margin:0;">
+        <div class="card-body" style="padding:.9rem 1rem;">
+            <div style="font-size:.78rem;color:var(--muted);">{% trans "Repasse corretora" %}</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--primary);">R$ {{ total_brokerage|floatformat:2 }}</div>
+        </div>
+    </div>
+    <div class="card" style="flex:1;min-width:160px;margin:0;">
+        <div class="card-body" style="padding:.9rem 1rem;">
+            <div style="font-size:.78rem;color:var(--muted);">{% trans "Repasse agente" %}</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--warning);">R$ {{ total_agent|floatformat:2 }}</div>
+        </div>
+    </div>
+    <div class="card" style="flex:1;min-width:160px;margin:0;">
+        <div class="card-body" style="padding:.9rem 1rem;">
+            <div style="font-size:.78rem;color:var(--muted);">{% trans "Repasse produtor" %}</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--success);">R$ {{ total_producer|floatformat:2 }}</div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="toolbar">
+    <label style="font-size:.8rem;color:var(--muted);">{% trans "De" %} <input type="date" name="start" value="{{ search_start|default:'' }}" style="padding:.5rem .6rem;border:1px solid var(--border);border-radius:8px;"></label>
+    <label style="font-size:.8rem;color:var(--muted);">{% trans "Até" %} <input type="date" name="end" value="{{ search_end|default:'' }}" style="padding:.5rem .6rem;border:1px solid var(--border);border-radius:8px;"></label>
+    <select name="agent" class="select" style="min-width:180px;">
+        <option value="">{% trans "Todos os agentes" %}</option>
+        {% for a in agents %}
+        <option value="{{ a.pk }}" {% if selected_agent|add:'0' == a.pk %}selected{% endif %}>{{ a.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="producer" class="select" style="min-width:180px;">
+        <option value="">{% trans "Todos os produtores" %}</option>
+        {% for p in producers %}
+        <option value="{{ p.pk }}" {% if selected_producer|add:'0' == p.pk %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+    </select>
+    {% if search_start or search_end or selected_agent or selected_producer %}
+    <a href="{% url 'commercial:commission_list' %}" class="btn btn-outline btn-sm">✕ {% trans "Limpar" %}</a>
+    {% endif %}
+    <button type="submit" class="btn btn-outline btn-sm">{% trans "Filtrar" %}</button>
+</form>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>{% trans "Data ref." %}</th>
+                    <th>{% trans "Apólice/Proposta" %}</th>
+                    <th>{% trans "Agente" %}</th>
+                    <th>{% trans "Produtor" %}</th>
+                    <th class="text-right">{% trans "Total" %}</th>
+                    <th class="text-right">{% trans "Corretora" %}</th>
+                    <th class="text-right">{% trans "Agente" %}</th>
+                    <th class="text-right">{% trans "Produtor" %}</th>
+                    <th class="text-right">{% trans "Ações" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in commissions %}
+                <tr>
+                    <td>{{ c.reference_date|date:"d/m/Y"|default:"—" }}</td>
+                    <td>
+                        {% if c.policy_id %}<a href="{% url 'policies:policy_detail' c.policy_id %}">{% trans "Apólice" %} {{ c.policy.number|default:c.policy_id }}</a>
+                        {% elif c.proposal_id %}<a href="{% url 'proposals:proposal_detail' c.proposal_id %}">{% trans "Proposta" %} #{{ c.proposal_id }}</a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{% if c.agent %}<a href="{% url 'commercial:agent_detail' c.agent_id %}">{{ c.agent.name }}</a>{% else %}—{% endif %}</td>
+                    <td>{% if c.producer %}<a href="{% url 'commercial:producer_detail' c.producer_id %}">{{ c.producer.name }}</a>{% else %}—{% endif %}</td>
+                    <td class="text-right">R$ {{ c.amount|floatformat:2 }}</td>
+                    <td class="text-right">R$ {{ c.brokerage_share|floatformat:2 }}</td>
+                    <td class="text-right">R$ {{ c.agent_share|floatformat:2 }}</td>
+                    <td class="text-right">R$ {{ c.producer_share|floatformat:2 }}</td>
+                    <td class="text-right">
+                        <a href="{% url 'commercial:commission_detail' c.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                        <a href="{% url 'commercial:commission_update' c.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="empty-row">
+                        <div class="empty-state">
+                            <div class="illustration">💰</div>
+                            <h3>{% trans "Nenhuma comissão ainda" %}</h3>
+                            <p>Registre a primeira comissão para acompanhar repasses de corretora, agente e produtor.</p>
+                            {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova comissão" %}</a>{% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="info">
+            {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+            Mostrando {{ start }}–{{ end }} de {{ total }} comissões
+            {% endblocktrans %}
+        </span>
+        <div class="pages">
+            {% if page_obj.has_previous %}<a href="?{% if search_start %}start={{ search_start }}&{% endif %}{% if search_end %}end={{ search_end }}&{% endif %}{% if selected_agent %}agent={{ selected_agent }}&{% endif %}{% if selected_producer %}producer={{ selected_producer }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
+            {% else %}<span>«</span>{% endif %}
+            {% for n in page_obj.paginator.page_range %}
+                {% if n == page_obj.number %}<span class="active">{{ n }}</span>
+                {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+                <a href="?{% if search_start %}start={{ search_start }}&{% endif %}{% if search_end %}end={{ search_end }}&{% endif %}{% if selected_agent %}agent={{ selected_agent }}&{% endif %}{% if selected_producer %}producer={{ selected_producer }}&{% endif %}page={{ n }}">{{ n }}</a>{% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}<a href="?{% if search_start %}start={{ search_start }}&{% endif %}{% if search_end %}end={{ search_end }}&{% endif %}{% if selected_agent %}agent={{ selected_agent }}&{% endif %}{% if selected_producer %}producer={{ selected_producer }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+            {% else %}<span>»</span>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

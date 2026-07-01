@@ -98,9 +98,9 @@ class PipelineStage(BaseTenantModel):
 class Deal(BaseTenantModel):
     """Tenanted commercial deal (negociação). PRD §16.9 / §19.3.
 
-    The ``producer`` FK (commercial.Producer, nullable per PRD §16.9) lands in
-    Sprint 19; ``ai_summary`` is populated by the "Resumir com IA" feature in
-    Sprint 23.
+    The ``producer`` FK (commercial.Producer, nullable per PRD §16.9) links the
+    deal to the corretor responsible. ``ai_summary`` is populated by the
+    "Resumir com IA" feature in Sprint 23.
     """
 
     STATUS_OPEN = 'aberta'
@@ -127,7 +127,14 @@ class Deal(BaseTenantModel):
         related_name='deals',
         verbose_name=_('etapa'),
     )
-    # ``producer`` FK (commercial.Producer, nullable) is added in Sprint 19.
+    producer = models.ForeignKey(
+        'commercial.Producer',
+        on_delete=models.SET_NULL,
+        related_name='deals',
+        verbose_name=_('produtor'),
+        null=True,
+        blank=True,
+    )
     title = models.CharField(_('título'), max_length=200)
     amount = models.DecimalField(
         _('valor'),

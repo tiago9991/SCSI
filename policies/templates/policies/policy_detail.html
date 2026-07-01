@@ -108,6 +108,93 @@
             </div>
         </div>
 
+        <div class="card" style="margin-top:1.25rem;">
+            <div class="card-head">
+                <h2>{% trans "Endossos" %}</h2>
+                <div class="card-head-right">
+                    <a href="{{ endorsement_create_url }}" class="btn btn-primary btn-sm">+ {% trans "Novo endosso" %}</a>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Número" %}</th>
+                                <th>{% trans "Tipo" %}</th>
+                                <th>{% trans "Eficácia" %}</th>
+                                <th>{% trans "Descrição" %}</th>
+                                <th>{% trans "Ações" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for end in endorsements %}
+                            <tr>
+                                <td>{{ end.number|default:"—" }}</td>
+                                <td><span class="pill">{{ end.get_type_display }}</span></td>
+                                <td>{{ end.effective_date|date:"d/m/Y"|default:"—" }}</td>
+                                <td>{{ end.description|default:"—" }}</td>
+                                <td>
+                                    <a href="{% url 'policies:endorsement_update' policy.pk end.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                                    <a href="{% url 'policies:endorsement_delete' policy.pk end.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Excluir" %}">🗑</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="empty-row" style="padding:1.5rem 1rem;">
+                                    {% trans "Nenhum endosso cadastrado para esta apólice." %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:1.25rem;">
+            <div class="card-head">
+                <h2>{% trans "Renovações" %}</h2>
+                <div class="card-head-right">
+                    <a href="{{ renewal_create_url }}" class="btn btn-primary btn-sm">+ {% trans "Nova renovação" %}</a>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Vencimento" %}</th>
+                                <th>{% trans "Status" %}</th>
+                                <th>{% trans "Observações" %}</th>
+                                <th>{% trans "Ações" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ren in renewals %}
+                            <tr>
+                                <td>{{ ren.due_date|date:"d/m/Y"|default:"—" }}</td>
+                                <td><span class="pill">{{ ren.get_status_display }}</span></td>
+                                <td>{{ ren.notes|default:"—" }}</td>
+                                <td>
+                                    <a href="{% url 'policies:renewal_detail' ren.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                                    <a href="{% url 'policies:renewal_update' ren.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                                    <a href="{% url 'policies:renewal_delete' ren.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Excluir" %}">🗑</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="empty-row" style="padding:1.5rem 1rem;">
+                                    {% trans "Nenhuma renovação cadastrada para esta apólice." %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         {# --- AI summary placeholder (Sprint 23) --- #}
         <div class="ai-block">
             <div class="ai-card">

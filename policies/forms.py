@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from policies.models import Policy, PolicyCoveredItem
+from policies.models import Endorsement, Policy, PolicyCoveredItem, Renewal
 
 
 class PolicyForm(forms.ModelForm):
@@ -117,3 +117,75 @@ class PolicyCoveredItemForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class EndorsementForm(forms.ModelForm):
+    """ModelForm for creating/updating a tenanted ``Endorsement`` (Sprint 18).
+
+    The ``policy`` FK is stamped from the URL on create (see the nested view)
+    and excluded from the rendered form.
+    """
+
+    class Meta:
+        model = Endorsement
+        fields = ['number', 'type', 'description', 'effective_date']
+        widgets = {
+            'number': forms.TextInput(attrs={'autocomplete': 'off',
+                                              'placeholder': _('Número do endosso')}),
+            'type': forms.Select(attrs={'class': 'select'}),
+            'description': forms.Textarea(attrs={'rows': 4,
+                                                  'placeholder': _('Descreva o endosso...')}),
+            'effective_date': forms.DateInput(attrs={'type': 'date', 'autocomplete': 'off'}),
+        }
+        labels = {
+            'number': _('Número'),
+            'type': _('Tipo'),
+            'description': _('Descrição'),
+            'effective_date': _('Data de eficácia'),
+        }
+
+
+class RenewalForm(forms.ModelForm):
+    """ModelForm for creating/updating a tenanted ``Renewal`` (Sprint 17).
+
+    When used from the top-level create view, ``policy`` is rendered as a
+    tenant-scoped select (the view's ``restrict_form_choices`` narrows the
+    queryset). When the renewal is created from a policy detail page, the
+    nested view excludes ``policy`` from the form and stamps it from the URL.
+    """
+
+    class Meta:
+        model = Renewal
+        fields = ['policy', 'due_date', 'status', 'notes']
+        widgets = {
+            'policy': forms.Select(attrs={'class': 'select'}),
+            'due_date': forms.DateInput(attrs={'type': 'date', 'autocomplete': 'off'}),
+            'status': forms.Select(attrs={'class': 'select'}),
+            'notes': forms.Textarea(attrs={'rows': 4,
+                                            'placeholder': _('Observações sobre a renovação...')}),
+        }
+        labels = {
+            'policy': _('Apólice'),
+            'due_date': _('Vencimento'),
+            'status': _('Status'),
+            'notes': _('Observações'),
+        }
+
+
+class RenewalNestedForm(forms.ModelForm):
+    """Nested renewal form (no ``policy`` field — stamped from the URL)."""
+
+    class Meta:
+        model = Renewal
+        fields = ['due_date', 'status', 'notes']
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date', 'autocomplete': 'off'}),
+            'status': forms.Select(attrs={'class': 'select'}),
+            'notes': forms.Textarea(attrs={'rows': 4,
+                                            'placeholder': _('Observações sobre a renovação...')}),
+        }
+        labels = {
+            'due_date': _('Vencimento'),
+            'status': _('Status'),
+            'notes': _('Observações'),
+        }

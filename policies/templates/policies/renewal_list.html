@@ -1,0 +1,116 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Controle de vencimentos e status das renovações." %}{% endblock %}
+
+{% block breadcrumb %}
+<span class="current">Renovações</span>
+{% endblock %}
+
+{% block page_actions %}
+{% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova renovação" %}</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="alerts-row" style="display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}days=30" class="btn {% if selected_days == '30' %}btn-primary{% else %}btn-outline{% endif %} btn-sm" title="{% trans "Renovações até 30 dias" %}">📅 30d · {{ alert_30 }}</a>
+    <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}days=60" class="btn {% if selected_days == '60' %}btn-primary{% else %}btn-outline{% endif %} btn-sm" title="{% trans "Renovações até 60 dias" %}">📅 60d · {{ alert_60 }}</a>
+    <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}days=90" class="btn {% if selected_days == '90' %}btn-primary{% else %}btn-outline{% endif %} btn-sm" title="{% trans "Renovações até 90 dias" %}">📅 90d · {{ alert_90 }}</a>
+    {% if selected_days %}<a href="{% url 'policies:renewal_list' %}" class="btn btn-outline btn-sm">✕ {% trans "Limpar prazo" %}</a>{% endif %}
+</div>
+
+<form method="get" class="toolbar">
+    <div class="search-input">
+        <span class="ico">⌕ {% trans "Buscar" %}</span>
+        <input type="search" name="q" value="{{ search|default:'' }}" placeholder="{% trans "Busque por apólice, cliente ou observações..." %}">
+    </div>
+    <select name="status" class="select" style="min-width:180px;">
+        <option value="">{% trans "Todos os status" %}</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    {% if search or selected_status or selected_days %}
+    <a href="{% url 'policies:renewal_list' %}" class="btn btn-outline btn-sm">✕ {% trans "Limpar" %}</a>
+    {% endif %}
+    <button type="submit" class="btn btn-outline btn-sm">{% trans "Filtrar" %}</button>
+</form>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>{% trans "Apólice" %}</th>
+                    <th>{% trans "Cliente" %}</th>
+                    <th>{% trans "Vencimento" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Observações" %}</th>
+                    <th class="text-right">{% trans "Ações" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ren in renewals %}
+                <tr>
+                    <td>
+                        <a href="{% url 'policies:policy_detail' ren.policy_id %}" class="row-link">{% if ren.policy.number %}{{ ren.policy.number }}{% else %}#{{ ren.policy_id }}{% endif %}</a>
+                    </td>
+                    <td>{{ ren.policy.client.full_name }}</td>
+                    <td>{{ ren.due_date|date:"d/m/Y"|default:"—" }}</td>
+                    <td><span class="pill">{{ ren.get_status_display }}</span></td>
+                    <td>{{ ren.notes|default:"—" }}</td>
+                    <td class="text-right">
+                        <a href="{% url 'policies:renewal_detail' ren.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                        <a href="{% url 'policies:renewal_update' ren.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-row">
+                        <div class="empty-state">
+                            <div class="illustration">🔁</div>
+                            <h3>{% trans "Nenhuma renovação ainda" %}</h3>
+                            <p>Registre a primeira renovação vinculada a uma apólice para acompanhar os vencimentos.</p>
+                            {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ {% trans "Nova renovação" %}</a>{% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="info">
+            {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+            Mostrando {{ start }}–{{ end }} de {{ total }} renovações
+            {% endblocktrans %}
+        </span>
+        <div class="pages">
+            {% if page_obj.has_previous %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_days %}days={{ selected_days }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
+            {% else %}
+            <span>«</span>
+            {% endif %}
+
+            {% for n in page_obj.paginator.page_range %}
+                {% if n == page_obj.number %}
+                <span class="active">{{ n }}</span>
+                {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+                <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_days %}days={{ selected_days }}&{% endif %}page={{ n }}">{{ n }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?{% if search %}q={{ search }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_days %}days={{ selected_days }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+            {% else %}
+            <span>»</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

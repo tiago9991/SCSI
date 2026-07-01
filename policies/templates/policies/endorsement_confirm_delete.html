@@ -1,0 +1,25 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Excluir endosso" %}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Confirme a exclusão do endosso." %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'policies:policy_list' %}">Apólices</a>
+{% if policy %}<a href="{% url 'policies:policy_detail' policy.pk %}">{% if policy.number %}{{ policy.number }}{% else %}#{% endif %}{{ policy.pk }}</a>{% endif %}
+<span class="current">{% trans "Excluir endosso" %}</span>
+{% endblock %}
+
+{% block content %}
+<div class="danger-card">
+    <p>{% blocktrans %}Tem certeza de que deseja excluir o endosso <strong>{{ object }}</strong>? Esta ação não pode ser desfeita.{% endblocktrans %}</p>
+</div>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+        <a href="{% url 'policies:policy_detail' object.policy_id %}" class="btn btn-outline">{% trans "Cancelar" %}</a>
+        <button type="submit" class="btn btn-danger">🗑 {% trans "Excluir definitivamente" %}</button>
+    </div>
+</form>
+{% endblock %}

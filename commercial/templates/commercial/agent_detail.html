@@ -1,0 +1,93 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{% trans "Detalhes do agente" %}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{% url 'commercial:agent_list' %}">Agentes</a>
+<span class="current">{{ agent.name }}</span>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ list_url }}" class="btn btn-outline btn-sm">← {% trans "Voltar" %}</a>
+<a href="{{ update_url }}" class="btn btn-outline btn-sm">✏ {% trans "Editar" %}</a>
+<a href="{{ delete_url }}" class="btn btn-outline btn-sm">🗑 {% trans "Excluir" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+    <div>
+        <div class="card">
+            <div class="card-head"><h2>{% trans "Dados do agente" %}</h2></div>
+            <div class="card-body">
+                <dl class="kv">
+                    <dt>{% trans "Nome" %}</dt><dd>{{ agent.name }}</dd>
+                    <dt>{% trans "Documento" %}</dt><dd>{{ agent.document|default:"—" }}</dd>
+                    <dt>{% trans "Tipo" %}</dt><dd><span class="pill">{{ agent.get_type_display }}</span></dd>
+                    <dt>{% trans "% Comissão" %}</dt><dd>{{ agent.commission_percent|floatformat:2 }}%</dd>
+                    <dt>{% trans "Contato" %}</dt><dd>{{ agent.contact|default:"—" }}</dd>
+                    <dt>{% trans "Cadastrado em" %}</dt><dd>{{ agent.created_at|date:"d/m/Y H:i" }}</dd>
+                    <dt>{% trans "Atualizado em" %}</dt><dd>{{ agent.updated_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:1.25rem;">
+            <div class="card-head">
+                <h2>{% trans "Produtores" %}</h2>
+                <div class="card-head-right">
+                    <a href="{{ producer_create_url }}" class="btn btn-primary btn-sm">+ {% trans "Novo produtor" %}</a>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Nome" %}</th>
+                                <th>{% trans "Documento" %}</th>
+                                <th>{% trans "% Comissão" %}</th>
+                                <th>{% trans "Contato" %}</th>
+                                <th class="text-right">{% trans "Ações" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in producers %}
+                            <tr>
+                                <td><a href="{% url 'commercial:producer_detail' p.pk %}" class="row-link">{{ p.name }}</a></td>
+                                <td>{{ p.document|default:"—" }}</td>
+                                <td>{{ p.commission_percent|floatformat:2 }}%</td>
+                                <td>{{ p.contact|default:"—" }}</td>
+                                <td class="text-right">
+                                    <a href="{% url 'commercial:producer_detail' p.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Ver" %}">👁</a>
+                                    <a href="{% url 'commercial:producer_update' p.pk %}" class="btn btn-ghost btn-sm" title="{% trans "Editar" %}">✏</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="empty-row" style="padding:1.5rem 1rem;">{% trans "Nenhum produtor vinculado a este agente." %}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside>
+        <div class="card">
+            <div class="card-head"><h2>{% trans "Resumo rápido" %}</h2></div>
+            <div class="card-body">
+                <p style="margin:0;color:var(--muted);font-size:.85rem;">
+                    {% blocktrans count counter=producers.count %}
+                    {{ counter }} produtor vinculado a este agente.
+                    {% plural %}
+                    {{ counter }} produtores vinculados a este agente.
+                    {% endblocktrans %}
+                </p>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

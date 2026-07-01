@@ -59,10 +59,8 @@ class PipelineStageForm(forms.ModelForm):
 class DealForm(forms.ModelForm):
     """ModelForm for creating/updating a tenanted ``Deal``.
 
-    FK choices (client, stage) are scoped to the current tenant from the view
-    via ``TenantFormMixin.restrict_form_choices``. The ``producer`` FK
-    (commercial.Producer, PRD §16.9) is not rendered yet — it lands in Sprint
-    19 once the ``commercial`` app exists.
+    FK choices (client, stage, producer) are scoped to the current tenant from
+    the view via ``TenantFormMixin.restrict_form_choices``.
     """
 
     class Meta:
@@ -70,6 +68,7 @@ class DealForm(forms.ModelForm):
         fields = [
             'client',
             'stage',
+            'producer',
             'title',
             'amount',
             'expected_close_date',
@@ -78,8 +77,9 @@ class DealForm(forms.ModelForm):
         widgets = {
             'client': forms.Select(attrs={'class': 'select'}),
             'stage': forms.Select(attrs={'class': 'select'}),
+            'producer': forms.Select(attrs={'class': 'select'}),
             'title': forms.TextInput(attrs={'autocomplete': 'off',
-                                            'placeholder': _('Título da negociação')}),
+                                             'placeholder': _('Título da negociação')}),
             'amount': forms.NumberInput(attrs={'step': '0.01', 'placeholder': '0,00'}),
             'expected_close_date': forms.DateInput(attrs={'type': 'date', 'autocomplete': 'off'}),
             'status': forms.Select(attrs={'class': 'select'}),
@@ -87,6 +87,7 @@ class DealForm(forms.ModelForm):
         labels = {
             'client': _('Cliente'),
             'stage': _('Etapa'),
+            'producer': _('Produtor'),
             'title': _('Título'),
             'amount': _('Valor'),
             'expected_close_date': _('Fechamento previsto'),
